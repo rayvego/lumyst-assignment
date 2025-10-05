@@ -2,7 +2,8 @@
 
 import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { BidirectionalEdge } from "@/components/BidirectionalEdge";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
 import { GraphFormatService } from "../core/graph-format.service";
 import { ReactFlowService } from "../core/react-flow.service";
@@ -29,15 +30,23 @@ const layoutedData = graphFormatService.layoutCategoriesWithNodes(
 );
 
 const { nodes: initialNodes, edges: initialEdges } = reactFlowService.convertDataToReactFlowDataTypes(
-	layoutedData.graphNodes,
+	layoutedData.graphNodes, 
 	layoutedData.c1Nodes,
 	layoutedData.c2Nodes,
-	layoutedData.edges,
+	layoutedData.edges, 
 );
 
 export default function App() {
 	const [nodes, setNodes] = useState(initialNodes);
 	const [edges, setEdges] = useState(initialEdges);
+
+	// Define custom edge types
+	const edgeTypes = useMemo(
+		() => ({
+			bidirectional: BidirectionalEdge,
+		}),
+		[]
+	);
 
 	const onNodesChange = useCallback(
 		(changes: any) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
@@ -57,6 +66,7 @@ export default function App() {
 			<ReactFlow
 				nodes={nodes}
 				edges={edges}
+				edgeTypes={edgeTypes}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
