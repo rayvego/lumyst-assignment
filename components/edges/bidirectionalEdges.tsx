@@ -62,7 +62,7 @@ export default function CustomEdge({
   
   if (isVertical) {
     // Offset the label for vertical edges
-    adjustedLabelY = labelY + (sourceY < targetY ? -10 : 10);
+    adjustedLabelY = labelY + (sourceY < targetY ? -20 : 20);
   }
 
   return (
