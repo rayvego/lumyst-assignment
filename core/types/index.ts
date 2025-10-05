@@ -11,6 +11,15 @@ export interface GraphEdge {
 	label: string;
 }
 
+export interface BidirectionalPair {
+	id: string;
+	source: string;
+	target: string;
+	forwardLabel: string;
+	backwardLabel: string;
+	isBidirectional: boolean;
+}
+
 export interface C1Output {
 	id: string;
 	label: string;

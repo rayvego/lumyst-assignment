@@ -1,11 +1,14 @@
-import type { GraphNode, GraphEdge, C1Output, C2Subcategory } from './types';
+import type { GraphNode, GraphEdge, C1Output, C2Subcategory, BidirectionalPair } from './types';
 
 export class ReactFlowService {
+
 	convertDataToReactFlowDataTypes(
 		graphNodes: GraphNode[],
 		c1Nodes: C1Output[],
 		c2Nodes: C2Subcategory[],
-		edges: GraphEdge[]
+		edges: GraphEdge[],
+		bidirectionalPairs: BidirectionalPair[],
+		processed: Set<string>
 	) {
 		const reactFlowNodes = [
 			// Regular graph nodes
@@ -50,20 +53,37 @@ export class ReactFlowService {
 			}))
 		];
 
-		const reactFlowEdges = edges.map((edge) => ({
-			id: edge.id,
-			source: edge.source,
-			target: edge.target,
-			label: edge.label,
-			style: edge.label === 'contains'
-				? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 } // Dashed light gray for containment
-				: edge.id.startsWith('c2_relationship')
-				? { stroke: '#059669', strokeWidth: 2 } // Dark green for C2-C2 relationships
-				: edge.id.startsWith('cross_c1_c2_rel')
-				? { stroke: '#d97706', strokeWidth: 2 } // Dark orange for cross C1-C2 relationships
-				: { stroke: '#374151', strokeWidth: 1 }, // Dark gray for other edges
-			labelStyle: { fill: '#000', fontWeight: '500' },
-		}));
+
+		const reactFlowEdges = [
+		...bidirectionalPairs.map((pair) => ({
+			id: pair.id,
+			source: pair.source,
+			target: pair.target,
+			type: 'bidirectional',
+			data: {
+				forwardLabel: pair.forwardLabel,
+				backwardLabel: pair.backwardLabel,
+			},
+			style: { stroke: '#059669', strokeWidth: 2 }, // Dark green for bidirectional edges
+			markerEnd: { type: 'arrowclosed', color: '#059669' },
+		})),
+			...edges
+				.filter(edge => !processed.has(edge.id))
+				.map((edge) => ({
+					id: edge.id,
+					source: edge.source,
+					target: edge.target,
+					label: edge.label,
+					style: edge.label === 'contains'
+						? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 } // Dashed light gray for containment
+						: edge.id.startsWith('c2_relationship')
+						? { stroke: '#059669', strokeWidth: 2 } // Dark green for C2-C2 relationships
+						: edge.id.startsWith('cross_c1_c2_rel')
+						? { stroke: '#d97706', strokeWidth: 2 } // Dark orange for cross C1-C2 relationships
+						: { stroke: '#374151', strokeWidth: 1 }, // Dark gray for other edges
+					labelStyle: { fill: '#000', fontWeight: '500' },
+				}))
+		];
 
 		return {
 			nodes: reactFlowNodes,

@@ -67,6 +67,26 @@ export class GraphFormatService {
 			}
 		});
 
+		const edgeMap = new Map(allEdges.map(e => [`${e.source}-${e.target}`, e]));
+		const processed = new Set<string>();
+		const bidirectionalPairs: any[] = [];
+
+		allEdges.forEach(edge => {
+			if (processed.has(edge.id)) return;
+			const reverse = edgeMap.get(`${edge.target}-${edge.source}`);
+			if (reverse) {
+				bidirectionalPairs.push({
+					id: `bidirectional-${edge.source}-${edge.target}`,
+					source: edge.source,
+					target: edge.target,
+					forwardLabel: edge.label,
+					backwardLabel: reverse.label,
+				});
+				processed.add(edge.id);
+				processed.add(reverse.id);
+			}
+		});
+
 		// Calculate layout
 		dagre.layout(dagreGraph);
 
@@ -109,6 +129,8 @@ export class GraphFormatService {
 			c1Nodes: positionedC1Nodes,
 			c2Nodes: positionedC2Nodes,
 			edges: allEdges,
+			bidirectionalPairs: bidirectionalPairs,
+			processed: processed,
 		};
 	}
 }
