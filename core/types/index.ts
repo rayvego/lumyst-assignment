@@ -1,7 +1,14 @@
+import React from "react";
+
 export interface GraphNode {
 	id: string;
 	label: string;
 	position?: { x: number; y: number };
+}
+
+interface customData {
+	style: React.CSSProperties;
+	stroke: string;
 }
 
 export interface GraphEdge {
@@ -9,6 +16,8 @@ export interface GraphEdge {
 	source: string;
 	target: string;
 	label: string;
+	type?: string;
+	data?: customData;
 }
 
 export interface C1Output {

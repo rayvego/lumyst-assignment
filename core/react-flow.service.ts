@@ -50,20 +50,39 @@ export class ReactFlowService {
 			}))
 		];
 
-		const reactFlowEdges = edges.map((edge) => ({
+		const edgePairs = new Set<string>();
+        edges.forEach(edge => {
+            const key1 = `${edge.source}-${edge.target}`;
+            const key2 = `${edge.target}-${edge.source}`;
+            if (edges.some(e => e.source === edge.target && e.target === edge.source)) {
+                edgePairs.add(key1);
+                edgePairs.add(key2);
+            }
+        });
+
+		const reactFlowEdges = edges.map((edge) => {
+			const key = `${edge.source}-${edge.target}`;
+            const isBidirectional = edgePairs.has(key);
+			const edgeStyle =
+                edge.label === 'contains'
+                    ? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 } // Dashed light gray for containment
+                    : edge.id.startsWith('c2_relationship')
+                    ? { stroke: '#059669', strokeWidth: 2 } // Dark green for C2-C2 relationships
+                    : edge.id.startsWith('cross_c1_c2_rel')
+                    ? { stroke: '#d97706', strokeWidth: 2 } // Dark orange for cross C1-C2 relationships
+                    : { stroke: '#374151', strokeWidth: 1 }; // Dark gray for other edges
+
+			return {
 			id: edge.id,
 			source: edge.source,
 			target: edge.target,
 			label: edge.label,
-			style: edge.label === 'contains'
-				? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 } // Dashed light gray for containment
-				: edge.id.startsWith('c2_relationship')
-				? { stroke: '#059669', strokeWidth: 2 } // Dark green for C2-C2 relationships
-				: edge.id.startsWith('cross_c1_c2_rel')
-				? { stroke: '#d97706', strokeWidth: 2 } // Dark orange for cross C1-C2 relationships
-				: { stroke: '#374151', strokeWidth: 1 }, // Dark gray for other edges
+			type: isBidirectional ? 'biDirectional' : 'default',
+			style: edgeStyle,
+			data: { style: edgeStyle, stroke: edgeStyle.stroke }, // Pass stroke color for marker styling
 			labelStyle: { fill: '#000', fontWeight: '500' },
-		}));
+		}
+		});
 
 		return {
 			nodes: reactFlowNodes,
