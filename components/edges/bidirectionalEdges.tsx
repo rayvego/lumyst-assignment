@@ -15,7 +15,7 @@ export type GetSpecialPathParams = {
 export const getSpecialPath = (
   { sourceX, sourceY, targetX, targetY }: GetSpecialPathParams,
   offset: number,
-): [string, number, number] => {
+): [string, number, number, boolean] => {
   const centerX = (sourceX + targetX) / 2;   
   const centerY = (sourceY + targetY) / 2;
   
@@ -32,7 +32,7 @@ export const getSpecialPath = (
   
   const path = `M ${sourceX} ${sourceY} Q ${controlX} ${controlY} ${targetX} ${targetY}`;
 
-  return [path, controlX, controlY];
+  return [path, controlX, controlY, isVertical];
 };
 
 export default function CustomEdge({
@@ -55,10 +55,15 @@ export default function CustomEdge({
     targetPosition,
   };
 
-  const [path, labelX, labelY] = getSpecialPath(
-    edgePathParams,
-    sourceX < targetX ? 25 : -25,
-  );
+  const offset = sourceX < targetX ? 25 : -25;
+  const [path, labelX, labelY, isVertical] = getSpecialPath(edgePathParams, offset);
+
+  let adjustedLabelY = labelY;
+  
+  if (isVertical) {
+    // Offset the label for vertical edges
+    adjustedLabelY = labelY + (sourceY < targetY ? -10 : 10);
+  }
 
   return (
     <>
@@ -68,7 +73,7 @@ export default function CustomEdge({
           <div
             style={{
               position: 'absolute',
-              transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+              transform: `translate(-50%, -50%) translate(${labelX}px,${adjustedLabelY}px)`,
               background: `${data?.stroke || 'grey'}`,
               padding: '2px 4px',
               borderRadius: '4px',
