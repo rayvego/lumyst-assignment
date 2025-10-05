@@ -1,5 +1,10 @@
 "use client";
 
+/* Project note (customizations vs original repo):
+   This page wires the data pipeline: raw analysis -> layout -> React Flow.
+   We keep the original event handlers but ensure large graphs open framed
+   (fitView + zoom bounds) for easier reading. */
+
 import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow } from "@xyflow/react";
 import type { Node, Edge, NodeChange, EdgeChange, Connection } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
@@ -62,7 +67,9 @@ export default function App() {
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
 				fitView
+				// Keep initial view framed for large graphs
 				minZoom={0.1}
+				// Limit zoom-in to avoid label pixelation and heavy reflows
 				maxZoom={2}
 				style={{ background: "white" }}
 			/>

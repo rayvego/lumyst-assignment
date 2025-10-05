@@ -1,3 +1,5 @@
+// Project note (types/index.ts): Domain types emitted by analysis
+// Minimal by design; the layout service assigns coordinates later.
 export interface GraphNode {
 	id: string;
 	label: string;
@@ -8,7 +10,7 @@ export interface GraphEdge {
 	id: string;
 	source: string;
 	target: string;
-	label: string;
+	label: string; // relationship type (e.g., contains, calls, etc.)
 }
 
 export interface C1Output {

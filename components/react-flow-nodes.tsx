@@ -36,7 +36,7 @@ export function C1CategoryNode({ data, selected }: CategoryNodeProps) {
 						className="font-semibold text-white text-sm line-clamp-2"
 						title={data.categoryData?.c1Category || data.label}
 					>
-						{data.categoryData?.c1Category || data.label + "fuck"}
+						{data.categoryData?.c1Category || data.label}
 					</h3>
 					<p className="text-purple-200 text-xs">{data.categoryData?.nodesInCategory || 0} nodes</p>
 				</div>
@@ -64,7 +64,7 @@ export function C2SubcategoryNode({ data, selected }: CategoryNodeProps) {
 						className="font-semibold text-white text-sm line-clamp-2"
 						title={data.categoryData?.c2Name || data.label}
 					>
-						{data.categoryData?.c2Name || data.label + "fuck"}
+						{data.categoryData?.c2Name || data.label}
 					</h4>
 					<p className="text-indigo-200 text-xs">{data.categoryData?.nodeCount || 0} nodes</p>
 				</div>
@@ -76,7 +76,7 @@ export function C2SubcategoryNode({ data, selected }: CategoryNodeProps) {
 }
 
 // Graph Node Component (for individual code elements)
-export function GraphNode({ data }: BaseNodeProps) {
+export function GraphNode({ data, selected }: BaseNodeProps) {
 	// Get colors based on node type - matching formatService.ts
 	const getNodeColors = (nodeType: string) => {
 		switch (nodeType) {
@@ -135,7 +135,7 @@ export function GraphNode({ data }: BaseNodeProps) {
 		}
 	};
 
-    const colors = getNodeColors(data.type ?? "default");
+	const colors = getNodeColors(data.type ?? "default");
 
 	return (
 		<div
@@ -159,7 +159,7 @@ export function GraphNode({ data }: BaseNodeProps) {
 				/>
 				<div className="flex-1 min-w-0">
 					<h4 className="font-semibold text-white text-sm line-clamp-2" title={data.label}>
-						{data.label + "fuck"}
+						{data.label}
 					</h4>
 					<p className="text-xs" style={{ color: colors.text }}>
 						{data.syntaxType || data.type}

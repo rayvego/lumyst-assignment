@@ -1,5 +1,12 @@
 import type { GraphNode, GraphEdge, C1Output, C2Subcategory } from './types';
 
+/** Project note (customizations vs original repo)
+ * This mapper adds two practical tweaks for clarity:
+ * 1) Node de-duplication by id so the same entity is not rendered twice.
+ * 2) Reciprocal edges (A→B and B→A) get small label offsets so both remain
+ *    readable on curved edges without changing the default edge type.
+ */
+
 export class ReactFlowService {
 	convertDataToReactFlowDataTypes(
 		graphNodes: GraphNode[],
@@ -7,7 +14,7 @@ export class ReactFlowService {
 		c2Nodes: C2Subcategory[],
 		edges: GraphEdge[]
 	) {
-		// De-duplicate nodes by id across all categories
+		// De-duplicate nodes by id across all categories (change)
 		const nodeById = new Map<string, { id: string; position: { x: number; y: number }; data: { label: string }; type: 'default'; style: Record<string, string> }>();
 		const pushUnique = (n: { id: string; position?: { x: number; y: number }; data: { label: string }; type: 'default'; style: Record<string, string> }) => {
 			if (!nodeById.has(n.id)) {
@@ -58,7 +65,7 @@ export class ReactFlowService {
 
 		const reactFlowNodes = Array.from(nodeById.values());
 
-		// Build a lookup to detect reciprocal edges (A->B and B->A)
+		// Detect reciprocal edges (A->B and B->A) to separate labels slightly (change)
 		const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
 		const pairCounts = new Map<string, number>();
 		edges.forEach((e) => {
