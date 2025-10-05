@@ -135,7 +135,7 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
 		}
 	};
 
-	const colors = getNodeColors(data.type);
+	const colors = getNodeColors(data.type ?? "default");
 
 	return (
 		<div
