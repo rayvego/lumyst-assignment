@@ -55,17 +55,18 @@ export class ReactFlowService {
 
 
 		const reactFlowEdges = [
-			...bidirectionalPairs.map((pair) => ({
-				id: pair.id,
-				source: pair.source,
-				target: pair.target,
-				type: 'bidirectional',
-				data: {
-					forwardLabel: pair.forwardLabel,
-					backwardLabel: pair.backwardLabel,
-				},
-				style: { stroke: '#059669', strokeWidth: 2 }, // Dark green for bidirectional edges
-			})),
+		...bidirectionalPairs.map((pair) => ({
+			id: pair.id,
+			source: pair.source,
+			target: pair.target,
+			type: 'bidirectional',
+			data: {
+				forwardLabel: pair.forwardLabel,
+				backwardLabel: pair.backwardLabel,
+			},
+			style: { stroke: '#059669', strokeWidth: 2 }, // Dark green for bidirectional edges
+			markerEnd: { type: 'arrowclosed', color: '#059669' },
+		})),
 			...edges
 				.filter(edge => !processed.has(edge.id))
 				.map((edge) => ({
