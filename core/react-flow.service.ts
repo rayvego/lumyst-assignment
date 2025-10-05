@@ -72,7 +72,14 @@ export class ReactFlowService {
 	const offsetSign = hasReciprocal ? (edge.source < edge.target ? 1 : -1) : 0;
 	const labelYOffset = hasReciprocal ? 18 * offsetSign : 0;
 	const labelXOffset = hasReciprocal ? 12 * offsetSign : 0;
-
+		const labelBorder =
+    edge.label === 'contains'
+      ? { stroke: '#9ca3af', strokeWidth: 1 }
+      : edge.id.startsWith('c2_relationship')
+      ? { stroke: '#059669', strokeWidth: 1.5 }
+      : edge.id.startsWith('cross_c1_c2_rel')
+      ? { stroke: '#d97706', strokeWidth: 1.5 }
+      : { stroke: '#6b7280', strokeWidth: 1 };
 	return {
 		id: edge.id,
 		source: edge.source,
@@ -95,11 +102,12 @@ export class ReactFlowService {
 		},
 
 		labelShowBg: true,
-		labelBgPadding: [6, 3] as [number, number],
+		labelBgPadding: [6, 4] as [number, number],
 		labelBgBorderRadius: 4,
 		labelBgStyle: {
 			fill: '#ffffff',
-			transform: `translate(${labelXOffset}px, ${labelYOffset}px)` // <-- sync bg offset
+			transform: `translate(${labelXOffset}px, ${labelYOffset}px)` ,
+			...labelBorder,    // <-- sync bg offset
 		}
 	};
 });
