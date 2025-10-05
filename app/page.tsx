@@ -2,7 +2,8 @@
 
 import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
+import { BidirectionalEdge } from "../components/BidirectionalEdge";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
 import { GraphFormatService } from "../core/graph-format.service";
 import { ReactFlowService } from "../core/react-flow.service";
@@ -33,11 +34,20 @@ const { nodes: initialNodes, edges: initialEdges } = reactFlowService.convertDat
 	layoutedData.c1Nodes,
 	layoutedData.c2Nodes,
 	layoutedData.edges,
+	layoutedData.bidirectionalPairs,
+	layoutedData.processed
 );
 
 export default function App() {
 	const [nodes, setNodes] = useState(initialNodes);
 	const [edges, setEdges] = useState(initialEdges);
+
+	const edgeTypes = useMemo(
+		() => ({
+			bidirectional: BidirectionalEdge,
+		}),
+		[]
+	);
 
 	const onNodesChange = useCallback(
 		(changes: any) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
@@ -59,6 +69,7 @@ export default function App() {
 				edges={edges}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
+				edgeTypes={edgeTypes}
 				onConnect={onConnect}
 				fitView
 				minZoom={0.1}
