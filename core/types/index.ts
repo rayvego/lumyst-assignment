@@ -3,6 +3,13 @@ export interface GraphNode {
 	id: string;
 	label: string;
 	position?: { x: number; y: number };
+	// Optional importance metadata (set by importance-ranking service)
+	importanceScore?: number; // 0.0 (utility) .. 1.0 (core)
+	isUtility?: boolean;
+	// Optional code metadata (present when using analysis-with-code.json)
+	filePath?: string;
+	syntaxType?: string; // e.g., Class, Method, Function, etc.
+	code?: string; // raw code for triviality heuristics
 }
 
 export interface GraphEdge {
@@ -19,6 +26,8 @@ export interface C1Output {
 	nodesInCategory: number;
 	nodeIds: string[];
 	position?: { x: number; y: number };
+	importanceScore?: number;
+	isUtility?: boolean;
 }
 
 export interface C2Subcategory {
@@ -31,6 +40,8 @@ export interface C2Subcategory {
 	nodeCount: number;
 	nodeIds: string[];
 	position?: { x: number; y: number };
+	importanceScore?: number;
+	isUtility?: boolean;
 }
 
 export interface C2Relationship {
@@ -56,6 +67,8 @@ export interface ReactFlowNode {
   position?: { x: number; y: number };
   data: {
     label: string;
+    importanceScore?: number;
+    isUtility?: boolean;
     type?: string;
     syntaxType?: string;
     filePath?: string;

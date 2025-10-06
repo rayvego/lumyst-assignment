@@ -36,19 +36,44 @@ export class ReactFlowService {
 			}
 		};
 
-		// Regular graph nodes
-		graphNodes.forEach((node) => pushUnique({
-			id: node.id,
-			position: node.position,
-			data: { label: node.label },
-			type: 'default',
-			style: {
-				background: '#dbeafe',
-				border: '2px solid #3b82f6',
-				color: '#1e40af',
-				borderRadius: '6px'
-			},
-		}));
+		// Regular graph nodes with importance-aware coloring
+		graphNodes.forEach((node) => {
+			const importance = node.importanceScore ?? 0;
+			const syntax = (node as any).syntaxType as (string | undefined);
+			const isFunctionLike = !!syntax && /function|method/i.test(syntax);
+			const isImportantFunction = !node.isUtility && isFunctionLike && importance >= 0.6;
+			const style = isImportantFunction
+				? {
+					background: '#ffedd5', // orange-100
+					border: '2px solid #f59e0b', // amber-500
+					color: '#b45309', // amber-700
+					opacity: '1',
+					borderRadius: '6px'
+				}
+				: node.isUtility
+				? {
+					background: '#f3f4f6',
+					border: '1px dashed #9ca3af',
+					color: '#6b7280',
+					opacity: '0.7',
+					borderRadius: '6px'
+				}
+				: {
+					background: '#dbeafe',
+					border: '2px solid #3b82f6',
+					color: '#1e40af',
+					opacity: '1',
+					borderRadius: '6px'
+				};
+
+			pushUnique({
+				id: node.id,
+				position: node.position,
+				data: { label: node.label },
+				type: 'default',
+				style,
+			});
+		});
 		// C1 category nodes
 		c1Nodes.forEach((node) => pushUnique({
 			id: node.id,
@@ -79,20 +104,110 @@ export class ReactFlowService {
 
 		const reactFlowNodes = Array.from(nodeById.values());
 
-		// Detect reciprocal edges (A->B and B->A) to separate labels slightly (change)
+		// Build lookup for node positions
+		const posById = new Map<string, { x: number; y: number }>(
+			reactFlowNodes.map(n => [n.id, { x: n.position.x, y: n.position.y }])
+		);
+
+		// 1) De-duplicate edges that share the same source, target, and label
+		const groupKey = (e: GraphEdge) => `${e.source}|${e.target}|${e.label || ''}`;
+		const grouped = new Map<string, { base: GraphEdge; count: number }>();
+		edges.forEach((e) => {
+			const gk = groupKey(e);
+			if (!grouped.has(gk)) grouped.set(gk, { base: e, count: 0 });
+			grouped.get(gk)!.count += 1;
+		});
+		const dedupedEdges: GraphEdge[] = Array.from(grouped.values()).map(({ base, count }) => ({
+			...base,
+			// If there are multiple identical relationships, collapse into one with a count suffix
+			label: count > 1 ? `${base.label} ×${count}` : base.label,
+		}));
+
+		// 2) Detect reciprocal edges (A->B and B->A) to separate with animation/hints
 		const pairKey = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
 		const pairCounts = new Map<string, number>();
-		edges.forEach((e) => {
+		dedupedEdges.forEach((e) => {
 			const key = pairKey(e.source, e.target);
 			pairCounts.set(key, (pairCounts.get(key) ?? 0) + 1);
 		});
 
-		const reactFlowEdges = edges.map((edge) => {
+		// 3) Track used label offsets per midpoint bucket to avoid overlapping labels
+		const GRID = 140; // group midpoints into buckets
+		const usedOffsetsByBucket = new Map<string, Set<string>>();
+
+		const reactFlowEdges = dedupedEdges.map((edge) => {
 	const key = pairKey(edge.source, edge.target);
 	const hasReciprocal = (pairCounts.get(key) ?? 0) > 1;
-	const offsetSign = hasReciprocal ? (edge.source < edge.target ? 1 : -1) : 0;
-	const labelYOffset = hasReciprocal ? 18 * offsetSign : 0;
-	const labelXOffset = hasReciprocal ? 12 * offsetSign : 0;
+
+	// Geometry
+	const sp = posById.get(edge.source) || { x: 0, y: 0 };
+	const tp = posById.get(edge.target) || { x: 0, y: 0 };
+	const midX = (sp.x + tp.x) / 2;
+	const midY = (sp.y + tp.y) / 2;
+	const dx = tp.x - sp.x;
+	const dy = tp.y - sp.y;
+	const len = Math.hypot(dx, dy) || 1;
+	const tx = dx / len;
+	const ty = dy / len;
+	const nx = -ty;
+	const ny = tx;
+
+	// Base perpendicular offset; bump if reciprocal
+	let perp = 24 + (hasReciprocal ? 12 : 0);
+
+	// Try to avoid collisions by adjusting along the tangent if an offset was used in this bucket
+	const bucketKey = `${Math.round(midX / GRID)}|${Math.round(midY / GRID)}`;
+	if (!usedOffsetsByBucket.has(bucketKey)) usedOffsetsByBucket.set(bucketKey, new Set());
+	const used = usedOffsetsByBucket.get(bucketKey)!;
+
+	// Spiral along tangent and slightly in perpendicular: 0, +s, -s, +2s, -2s...
+	const step = 22;
+	let along = 0;
+	let attempts = 0;
+	let extraPerp = 0;
+	let xo = nx * (perp + extraPerp) + tx * along;
+	let yo = ny * (perp + extraPerp) + ty * along;
+	let sig = `${Math.round(xo)},${Math.round(yo)}`;
+	while (used.has(sig) && attempts < 14) {
+		attempts++;
+		const k = Math.ceil(attempts / 2);
+		const sign = attempts % 2 === 0 ? -1 : 1;
+		along = sign * k * step;
+		// add a slight perpendicular stagger every other attempt
+		extraPerp = (k % 2 === 0 ? 6 : 0) * sign;
+		xo = nx * (perp + extraPerp) + tx * along;
+		yo = ny * (perp + extraPerp) + ty * along;
+		sig = `${Math.round(xo)},${Math.round(yo)}`;
+	}
+
+	// Avoid overlapping with source/target nodes: push further out if inside node rects
+	const NODE_W = 180, NODE_H = 60; // keep in sync with layout
+	const pad = 12; // padding around nodes for label clearance
+	function intersectsNode(cx: number, cy: number, nodePos: { x: number; y: number }): boolean {
+		const left = nodePos.x - NODE_W / 2 - pad;
+		const right = nodePos.x + NODE_W / 2 + pad;
+		const top = nodePos.y - NODE_H / 2 - pad;
+		const bottom = nodePos.y + NODE_H / 2 + pad;
+		return cx >= left && cx <= right && cy >= top && cy <= bottom;
+	}
+	let tries = 0;
+	while (tries < 8) {
+		const cx = midX + xo;
+		const cy = midY + yo;
+		const overlapWithSource = intersectsNode(cx, cy, sp);
+		const overlapWithTarget = intersectsNode(cx, cy, tp);
+		if (!overlapWithSource && !overlapWithTarget) break;
+		// push further away perpendicular to the edge; if still overlapping, also move along tangent
+		perp += 12;
+		if (tries % 2 === 1) along += (tries % 4 === 1 ? step : -step);
+		xo = nx * (perp + extraPerp) + tx * along;
+		yo = ny * (perp + extraPerp) + ty * along;
+		tries++;
+	}
+	used.add(sig);
+
+	const labelXOffset = xo;
+	const labelYOffset = yo;
 		const labelBorder =
     edge.label === 'contains'
       ? { stroke: '#9ca3af', strokeWidth: 1 }

@@ -10,11 +10,12 @@ import type { Node, Edge, NodeChange, EdgeChange, Connection } from "@xyflow/rea
 import "@xyflow/react/dist/style.css";
 import { useCallback, useState } from "react";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
-import { GraphFormatService, layoutGraph } from "../core/graph-format.service";
+import { layoutGraph } from "../core/graph-format.service";
 import { ReactFlowService } from "../core/react-flow.service";
+import { ImportanceRankingService, annotateNodesWithImportance } from "../core/importance-ranking.service";
 
-const graphFormatService = new GraphFormatService();
 const reactFlowService = new ReactFlowService();
+const importanceService = new ImportanceRankingService();
 
 const {
 	graphNodes,
@@ -25,20 +26,40 @@ const {
 	crossC1C2Relationships
 } = convertDataToGraphNodesAndEdges();
 
-const layoutedData = layoutGraph(
-	graphNodes,
-	graphEdges,
-	c1Output,
-	c2Subcategories,
-	c2Relationships,
-	crossC1C2Relationships
+// 1) Rank importance on RAW graph (before any layout)
+const ranked = importanceService.rank(
+    graphNodes.map((n) => {
+        // best-effort file path from id pattern: code:path:label:line
+        const parts = n.id.split(":");
+        const filePath = parts.length >= 3 ? parts[1] : undefined;
+        return { ...n, filePath } as any;
+    }),
+    graphEdges,
 );
 
+// 2) Annotate and optionally filter utilities
+const annotatedGraphNodes = annotateNodesWithImportance(graphNodes, ranked);
+const FILTER_UTILS = true;
+const utilityIds = new Set(ranked.filter(r => r.isUtility).map(r => r.id));
+const filteredGraphNodes = FILTER_UTILS ? annotatedGraphNodes.filter(n => !utilityIds.has(n.id)) : annotatedGraphNodes;
+const filteredEdges = FILTER_UTILS ? graphEdges.filter(e => !utilityIds.has(e.source) && !utilityIds.has(e.target)) : graphEdges;
+
+// 3) Layout AFTER ranking/filtering (enforced hierarchy + importance-aware distances)
+const layoutedData = layoutGraph(
+    filteredGraphNodes,
+    filteredEdges,
+    c1Output,
+    c2Subcategories,
+    c2Relationships,
+    crossC1C2Relationships
+);
+
+// 4) Convert to React Flow types
 const { nodes: initialNodes, edges: initialEdges } = reactFlowService.convertDataToReactFlowDataTypes(
-	layoutedData.graphNodes,
-	layoutedData.c1Nodes,
-	layoutedData.c2Nodes,
-	layoutedData.edges,
+    layoutedData.graphNodes,
+    layoutedData.c1Nodes,
+    layoutedData.c2Nodes,
+    layoutedData.edges,
 );
 
 export default function App() {
