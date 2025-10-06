@@ -1,14 +1,22 @@
+// Minimal by design; the layout service assigns coordinates later.
 export interface GraphNode {
 	id: string;
 	label: string;
 	position?: { x: number; y: number };
+	// Optional importance metadata (set by importance-ranking service)
+	importanceScore?: number; // 0.0 (utility) .. 1.0 (core)
+	isUtility?: boolean;
+	// Optional code metadata (present when using analysis-with-code.json)
+	filePath?: string;
+	syntaxType?: string; // e.g., Class, Method, Function, etc.
+	code?: string; // raw code for triviality heuristics
 }
 
 export interface GraphEdge {
 	id: string;
 	source: string;
 	target: string;
-	label: string;
+	label: string; // relationship type (e.g., contains, calls, etc.)
 }
 
 export interface C1Output {
@@ -18,6 +26,8 @@ export interface C1Output {
 	nodesInCategory: number;
 	nodeIds: string[];
 	position?: { x: number; y: number };
+	importanceScore?: number;
+	isUtility?: boolean;
 }
 
 export interface C2Subcategory {
@@ -30,6 +40,8 @@ export interface C2Subcategory {
 	nodeCount: number;
 	nodeIds: string[];
 	position?: { x: number; y: number };
+	importanceScore?: number;
+	isUtility?: boolean;
 }
 
 export interface C2Relationship {
@@ -47,4 +59,28 @@ export interface CrossC1C2Relationship {
 	toC1: string;
 	toC2: string;
 	label: string;
+}
+
+// Type used by React Flow node components for their `data` prop
+export interface ReactFlowNode {
+  id: string;
+  position?: { x: number; y: number };
+  data: {
+    label: string;
+    importanceScore?: number;
+    isUtility?: boolean;
+    type?: string;
+    syntaxType?: string;
+    filePath?: string;
+    isAbstract?: boolean;
+    isOverride?: boolean;
+    categoryData?: {
+      c1Category?: string;
+      c2Name?: string;
+      nodesInCategory?: number;
+      nodeCount?: number;
+      categoryDescription?: string;
+      description?: string;
+    };
+  };
 }
