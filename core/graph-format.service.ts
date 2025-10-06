@@ -26,6 +26,7 @@ export class GraphFormatService {
 				height: 80,
 				layoutOptions: {
 					'elk.nodeLabels.placement': 'INSIDE', // Label text inside the node
+					// 'elk.layered.layering.layer': '2'
 				}
 			})),
 			...c1Outputs.map(c1 => ({
@@ -34,6 +35,7 @@ export class GraphFormatService {
 				height: 90,
 				layoutOptions: {
 					'elk.nodeLabels.placement': 'INSIDE',
+					// 'elk.layered.layering.layer': '1'
 				}
 			})),
 			...c2Subcategories.map(c2 => ({
@@ -42,6 +44,8 @@ export class GraphFormatService {
 				height: 85,
 				layoutOptions: {
 					'elk.nodeLabels.placement': 'INSIDE',
+					// 'elk.layered.layering.layer': '0'
+					// 'elk.layered.priority': '0,
 				}
 			}))
 		];
