@@ -1,4 +1,3 @@
-// Project note (types/index.ts): Domain types emitted by analysis
 // Minimal by design; the layout service assigns coordinates later.
 export interface GraphNode {
 	id: string;

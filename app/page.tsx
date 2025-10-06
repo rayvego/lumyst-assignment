@@ -10,7 +10,7 @@ import type { Node, Edge, NodeChange, EdgeChange, Connection } from "@xyflow/rea
 import "@xyflow/react/dist/style.css";
 import { useCallback, useState } from "react";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
-import { GraphFormatService } from "../core/graph-format.service";
+import { GraphFormatService, layoutGraph } from "../core/graph-format.service";
 import { ReactFlowService } from "../core/react-flow.service";
 
 const graphFormatService = new GraphFormatService();
@@ -25,7 +25,7 @@ const {
 	crossC1C2Relationships
 } = convertDataToGraphNodesAndEdges();
 
-const layoutedData = graphFormatService.layoutCategoriesWithNodes(
+const layoutedData = layoutGraph(
 	graphNodes,
 	graphEdges,
 	c1Output,

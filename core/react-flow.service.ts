@@ -1,6 +1,20 @@
 import type { GraphNode, GraphEdge, C1Output, C2Subcategory } from './types';
 
-/** Project note (customizations vs original repo)
+/** Project note (cust		labelStyle: {
+			fill: '#000',
+			fontWeight: '500',
+			pointerEvents: 'none',
+			transform: `translate(${edge.position?.x || 0}px, ${edge.position?.y || 0}px)`,
+			transition: 'transform 150ms ease' // Smooth label movement
+		},
+		labelBgStyle: {
+			fill: '#fff',
+			stroke: edge.style?.stroke || '#6b7280',
+			strokeWidth: 1,
+			rx: 4,
+			opacity: 0.9
+		},
+		labelShowBg: true,ions vs original repo)
  * This mapper adds two practical tweaks for clarity:
  * 1) Node de-duplication by id so the same entity is not rendered twice.
  * 2) Reciprocal edges (A→B and B→A) get small label offsets so both remain
@@ -92,6 +106,8 @@ export class ReactFlowService {
 		source: edge.source,
 		target: edge.target,
 		label: edge.label,
+		type: 'bezier', // Use bezier curved edges
+		animated: hasReciprocal, // Animate bidirectional edges
 		style:
 			edge.label === 'contains'
 				? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 }
@@ -105,7 +121,8 @@ export class ReactFlowService {
 			fill: '#000',
 			fontWeight: '500',
 			pointerEvents: 'none',
-			transform: `translate(${labelXOffset}px, ${labelYOffset}px)`
+			transform: `translate(${labelXOffset}px, ${labelYOffset}px)`,
+			transition: 'transform 150ms ease'
 		},
 
 		labelShowBg: true,
@@ -113,8 +130,20 @@ export class ReactFlowService {
 		labelBgBorderRadius: 4,
 		labelBgStyle: {
 			fill: '#ffffff',
-			transform: `translate(${labelXOffset}px, ${labelYOffset}px)` ,
-			...labelBorder,    // <-- sync bg offset
+			transform: `translate(${labelXOffset}px, ${labelYOffset}px)`,
+			...labelBorder
+		},
+		markerEnd: {
+			type: 'arrowclosed',
+			width: 15,
+			height: 15,
+			color: edge.label === 'contains'
+				? '#9ca3af'
+				: edge.id.startsWith('c2_relationship')
+				? '#059669'
+				: edge.id.startsWith('cross_c1_c2_rel')
+				? '#d97706'
+				: '#374151'
 		}
 	};
 });
