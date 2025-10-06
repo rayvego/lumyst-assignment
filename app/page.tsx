@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
 import { GraphFormatService } from "../core/graph-format.service";
 import { ReactFlowService } from "../core/react-flow.service";
+import NodeLegend from "../components/NodeLegend";
 
 const graphFormatService = new GraphFormatService();
 const reactFlowService = new ReactFlowService();
@@ -89,6 +90,7 @@ export default function App() {
 				maxZoom={2}
 				style={{ background: "white" }}
 			/>
+			<NodeLegend />
 		</div>
 	);
 }
