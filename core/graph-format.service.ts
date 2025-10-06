@@ -25,7 +25,7 @@ export class GraphFormatService {
 				width: 220,
 				height: 80,
 				layoutOptions: {
-					'elk.nodeLabels.placement': 'INSIDE' // Label text inside the node
+					'elk.nodeLabels.placement': 'INSIDE', // Label text inside the node
 				}
 			})),
 			...c1Outputs.map(c1 => ({
@@ -33,7 +33,7 @@ export class GraphFormatService {
 				width: 240,
 				height: 90,
 				layoutOptions: {
-					'elk.nodeLabels.placement': 'INSIDE'
+					'elk.nodeLabels.placement': 'INSIDE',
 				}
 			})),
 			...c2Subcategories.map(c2 => ({
@@ -41,7 +41,7 @@ export class GraphFormatService {
 				width: 220,
 				height: 85,
 				layoutOptions: {
-					'elk.nodeLabels.placement': 'INSIDE'
+					'elk.nodeLabels.placement': 'INSIDE',
 				}
 			}))
 		];
@@ -101,16 +101,7 @@ export class GraphFormatService {
 			layoutOptions: {
 				'elk.algorithm': 'layered',
 				'elk.direction': 'DOWN',
-				'elk.spacing.nodeNode': '60',
-				'elk.spacing.componentComponent': '80',
-				'elk.layered.spacing.nodeNodeBetweenLayers': '120',
-				'elk.spacing.edgeNode': '40',
-				'elk.spacing.edgeEdge': '25',
-				'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
-				'elk.layered.nodePlacement.strategy': 'BRANDES_KOEPF',
-				'elk.layered.cycleBreaking.strategy': 'GREEDY',
-				'elk.separateConnectedComponents': 'true',
-				'elk.padding': '[top=50,left=50,bottom=50,right=50]'
+				'elk.layered.layering.strategy': 'INTERACTIVE', // Use interactive layering to respect layer constraints
 			},
 			children: elkNodes,
 			edges: elkEdges
