@@ -63,6 +63,7 @@ export class ReactFlowService {
 				? { stroke: '#d97706', strokeWidth: 2 } // Dark orange for cross C1-C2 relationships
 				: { stroke: '#374151', strokeWidth: 1 }, // Dark gray for other edges
 			labelStyle: { fill: '#000', fontWeight: '500' },
+			type: 'smoothstep'
 		}));
 
 		return {
