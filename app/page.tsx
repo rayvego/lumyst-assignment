@@ -1,11 +1,16 @@
 "use client";
 
-import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow } from "@xyflow/react";
+import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow, EdgeTypes } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useState } from "react";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
 import { GraphFormatService } from "../core/graph-format.service";
 import { ReactFlowService } from "../core/react-flow.service";
+import BidirectionalEdge from "../components/bidirectional-edge";
+
+const edgeTypes: EdgeTypes = {
+	bidirectional: BidirectionalEdge,
+};
 
 const graphFormatService = new GraphFormatService();
 const reactFlowService = new ReactFlowService();
@@ -60,6 +65,7 @@ export default function App() {
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
+				edgeTypes={edgeTypes}
 				fitView
 				minZoom={0.1}
 				maxZoom={2}
