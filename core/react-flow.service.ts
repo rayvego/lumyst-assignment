@@ -8,7 +8,7 @@ export class ReactFlowService {
 		edges: GraphEdge[]
 	) {
 		const reactFlowNodes = [
-			// Regular graph nodes
+			// Regular graph nodes - smaller, cleaner
 			...graphNodes.map((node) => ({
 				id: node.id,
 				position: node.position || { x: 0, y: 0 },
@@ -18,10 +18,14 @@ export class ReactFlowService {
 					background: '#dbeafe',
 					border: '2px solid #3b82f6',
 					color: '#1e40af',
-					borderRadius: '6px'
+					borderRadius: '8px',
+					padding: '6px 10px',
+					fontSize: '11px',
+					width: '140px',
+					height: '35px'
 				},
 			})),
-			// C1 category nodes
+			// C1 category nodes - larger, more prominent
 			...c1Nodes.map((node) => ({
 				id: node.id,
 				position: node.position || { x: 0, y: 0 },
@@ -32,10 +36,14 @@ export class ReactFlowService {
 					border: '3px solid #dc2626',
 					color: '#991b1b',
 					fontWeight: 'bold',
-					borderRadius: '6px'
+					borderRadius: '12px',
+					padding: '12px 16px',
+					fontSize: '14px',
+					width: '200px',
+					height: '60px'
 				},
 			})),
-			// C2 subcategory nodes
+			// C2 subcategory nodes - medium size
 			...c2Nodes.map((node) => ({
 				id: node.id,
 				position: node.position || { x: 0, y: 0 },
@@ -43,9 +51,14 @@ export class ReactFlowService {
 				type: 'default',
 				style: {
 					background: '#f0fdf4',
-					border: '2px solid #16a34a',
+					border: '3px solid #16a34a',
 					color: '#166534',
-					borderRadius: '6px'
+					fontWeight: '600',
+					borderRadius: '10px',
+					padding: '8px 12px',
+					fontSize: '12px',
+					width: '170px',
+					height: '45px'
 				},
 			}))
 		];
@@ -54,15 +67,15 @@ export class ReactFlowService {
 			id: edge.id,
 			source: edge.source,
 			target: edge.target,
-			label: edge.label,
+			label: edge.label === 'contains' ? '' : edge.label, // Remove labels from containment edges
 			style: edge.label === 'contains'
-				? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 } // Dashed light gray for containment
+				? { stroke: '#e5e7eb', strokeDasharray: '3,3', strokeWidth: 0.5, opacity: 0.3 } // Very subtle containment edges
 				: edge.id.startsWith('c2_relationship')
-				? { stroke: '#059669', strokeWidth: 2 } // Dark green for C2-C2 relationships
+				? { stroke: '#059669', strokeWidth: 2.5, opacity: 0.8 } // Prominent relationship edges
 				: edge.id.startsWith('cross_c1_c2_rel')
-				? { stroke: '#d97706', strokeWidth: 2 } // Dark orange for cross C1-C2 relationships
-				: { stroke: '#374151', strokeWidth: 1 }, // Dark gray for other edges
-			labelStyle: { fill: '#000', fontWeight: '500' },
+				? { stroke: '#d97706', strokeWidth: 2.5, opacity: 0.8 } // Prominent cross-category edges
+				: { stroke: '#6b7280', strokeWidth: 1.5, opacity: 0.6 }, // Subtle other edges
+			labelStyle: { fill: '#374151', fontWeight: '600', fontSize: '12px' },
 		}));
 
 		return {
