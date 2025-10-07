@@ -6,6 +6,7 @@ import { useCallback, useState } from "react";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
 import { GraphFormatService } from "../core/graph-format.service";
 import { ReactFlowService } from "../core/react-flow.service";
+import { BidirectionalCurvedEdge } from "../components/BidirectionalCurvedEdge";
 
 const graphFormatService = new GraphFormatService();
 const reactFlowService = new ReactFlowService();
@@ -35,6 +36,11 @@ const { nodes: initialNodes, edges: initialEdges } = reactFlowService.convertDat
 	layoutedData.edges,
 );
 
+// Register custom edge types
+const edgeTypes = {
+	'bidirectional-curved': BidirectionalCurvedEdge,
+};
+
 export default function App() {
 	const [nodes, setNodes] = useState(initialNodes);
 	const [edges, setEdges] = useState(initialEdges);
@@ -57,6 +63,7 @@ export default function App() {
 			<ReactFlow
 				nodes={nodes}
 				edges={edges}
+				edgeTypes={edgeTypes}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
