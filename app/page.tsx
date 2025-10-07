@@ -1,11 +1,13 @@
 "use client";
 
-import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow } from "@xyflow/react";
+import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow, type Node, type Edge, type NodeChange, type EdgeChange, type Connection } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useState } from "react";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
 import { GraphFormatService } from "../core/graph-format.service";
 import { ReactFlowService } from "../core/react-flow.service";
+import { edgeTypes } from "../components/custom-edges";
+import { nodeTypes } from "../components/react-flow-nodes";
 
 const graphFormatService = new GraphFormatService();
 const reactFlowService = new ReactFlowService();
@@ -60,6 +62,8 @@ export default function App() {
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
+				nodeTypes={nodeTypes}
+				edgeTypes={edgeTypes}
 				fitView
 				minZoom={0.1}
 				maxZoom={2}
