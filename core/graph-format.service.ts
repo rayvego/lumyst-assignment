@@ -43,15 +43,7 @@ export class GraphFormatService {
 				target: c2.id,
 				label: 'contains'
 			})),
-			// Edges from C2 to their nodes
-			...c2Subcategories.flatMap(c2 =>
-				c2.nodeIds.map(nodeId => ({
-					id: `c2-${c2.id}-to-node-${nodeId}`,
-					source: c2.id,
-					target: nodeId,
-					label: 'contains'
-				}))
-			),
+
 			// C2 relationships
 			...c2Relationships.map(rel => {
 				const sourceId = c2NameToIdMap.get(rel.fromC2);
@@ -67,21 +59,6 @@ export class GraphFormatService {
 					label: rel.label
 				};
 			}).filter((edge): edge is GraphEdge => edge !== null),
-			// Cross C1-C2 relationships (connect C2 nodes across different C1 categories)
-			...crossC1C2Relationships.map(rel => {
-				const sourceId = c2NameToIdMap.get(rel.fromC2);
-				const targetId = c2NameToIdMap.get(rel.toC2);
-				if (!sourceId || !targetId) {
-					// Skip relationships where C2 nodes don't exist
-					return null;
-				}
-				return {
-					id: rel.id,
-					source: sourceId,
-					target: targetId,
-					label: rel.label
-				};
-			}).filter((edge): edge is GraphEdge => edge !== null)
 		];
 
 		allEdges.forEach((edge) => {
