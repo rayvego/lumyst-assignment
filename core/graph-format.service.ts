@@ -1,8 +1,37 @@
 import dagre from 'dagre';
 import type { GraphNode, GraphEdge, C1Output, C2Subcategory, C2Relationship, CrossC1C2Relationship } from './types';
+import { HierarchicalLayoutService } from './hierarchical-layout.service';
 
 export class GraphFormatService {
+	private hierarchicalLayoutService = new HierarchicalLayoutService();
+
+	/**
+	 * Main layout function that uses the improved hierarchical algorithm
+	 */
 	layoutCategoriesWithNodes(
+		graphNodes: GraphNode[],
+		graphEdges: GraphEdge[],
+		c1Outputs: C1Output[],
+		c2Subcategories: C2Subcategory[],
+		c2Relationships: C2Relationship[],
+		crossC1C2Relationships: CrossC1C2Relationship[]
+	) {
+		// Use the new hierarchical layout service for better arrangement
+		return this.hierarchicalLayoutService.layoutHierarchicalGraph(
+			graphNodes,
+			graphEdges,
+			c1Outputs,
+			c2Subcategories,
+			c2Relationships,
+			crossC1C2Relationships
+		);
+	}
+
+	/**
+	 * Legacy layout method (keeping for backward compatibility)
+	 * This is the original dagre-based layout
+	 */
+	layoutCategoriesWithNodesLegacy(
 		graphNodes: GraphNode[],
 		graphEdges: GraphEdge[],
 		c1Outputs: C1Output[],
@@ -27,7 +56,6 @@ export class GraphFormatService {
 			...c1Outputs.map(c1 => ({ ...c1, type: 'c1' })),
 			...c2Subcategories.map(c2 => ({ ...c2, type: 'c2' }))
 		];
-
 
 		allNodes.forEach((node) => {
 			dagreGraph.setNode(node.id, { width: 150, height: 50 });
@@ -133,5 +161,12 @@ export class GraphFormatService {
 			c2Nodes: positionedC2Nodes,
 			edges: allEdges,
 		};
+	}
+
+	/**
+	 * Update layout configuration for the hierarchical layout service
+	 */
+	updateLayoutConfig(config: any) {
+		this.hierarchicalLayoutService.updateConfig(config);
 	}
 }
