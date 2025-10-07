@@ -1,4 +1,3 @@
-import dagre from 'dagre';
 import type { GraphNode, GraphEdge, C1Output, C2Subcategory, C2Relationship, CrossC1C2Relationship } from './types';
 
 interface LayoutNode {

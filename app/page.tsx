@@ -16,8 +16,8 @@ const {
     c1Output,
     c2Subcategories,
     c2Relationships,
-    crossC1C2Relationships
-} = convertDataToGraphNodesAndEdges();
+    crossC1C2Relationships,
+} = convertDataToGraphNodesAndEdges(true); // Pass true to enable utility filtering
 
 const layoutedData = graphFormatService.layoutCategoriesWithNodes(
     graphNodes,
@@ -149,6 +149,7 @@ export default function App() {
                     }}>
                         Total: {nodes.length} nodes • {edges.length} edges
                     </div>
+                    
                 </Panel>
                 
             
