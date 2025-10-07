@@ -50,113 +50,24 @@ export class ReactFlowService {
 			}))
 		];
 
-		// Process edges to detect and merge bidirectional pairs
-		const processedEdges = this.mergeBidirectionalEdges(edges);
+		const reactFlowEdges = edges.map((edge) => ({
+			id: edge.id,
+			source: edge.source,
+			target: edge.target,
+			label: edge.label,
+			style: edge.label === 'contains'
+				? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 } // Dashed light gray for containment
+				: edge.id.startsWith('c2_relationship')
+				? { stroke: '#059669', strokeWidth: 2 } // Dark green for C2-C2 relationships
+				: edge.id.startsWith('cross_c1_c2_rel')
+				? { stroke: '#d97706', strokeWidth: 2 } // Dark orange for cross C1-C2 relationships
+				: { stroke: '#374151', strokeWidth: 1 }, // Dark gray for other edges
+			labelStyle: { fill: '#000', fontWeight: '500' },
+		}));
 
 		return {
 			nodes: reactFlowNodes,
-			edges: processedEdges,
+			edges: reactFlowEdges,
 		};
-	}
-
-	private mergeBidirectionalEdges(edges: GraphEdge[]) {
-		const processedEdges: any[] = [];
-		const handledEdges = new Set<string>();
-		const seenBidirectionalPairs = new Set<string>(); // Track bidirectional pairs
-
-		edges.forEach((edge) => {
-			// Skip if already processed as part of a bidirectional pair
-			if (handledEdges.has(edge.id)) return;
-
-			// Check if this is a self-loop (source === target)
-			const isSelfLoop = edge.source === edge.target;
-
-			if (isSelfLoop) {
-				// Self-loop: treat as regular unidirectional edge
-				processedEdges.push({
-					id: edge.id,
-					source: edge.source,
-					target: edge.target,
-					label: edge.label,
-					style: this.getEdgeStyle(edge),
-					labelStyle: { fill: '#000', fontWeight: '500' },
-				});
-				handledEdges.add(edge.id);
-				return;
-			}
-
-			// Look for reverse edge (only for non-self-loops)
-			const reverseEdge = edges.find(
-				e => e.source === edge.target && 
-				     e.target === edge.source && 
-				     e.id !== edge.id &&
-				     !handledEdges.has(e.id) // Make sure it hasn't been processed
-			);
-
-			if (reverseEdge) {
-				// Create consistent ID by sorting source and target alphabetically
-				const sortedNodes = [edge.source, edge.target].sort();
-				const pairKey = `${sortedNodes[0]}-${sortedNodes[1]}`;
-				
-				// Check if we've already created a bidirectional edge for this pair
-				if (seenBidirectionalPairs.has(pairKey)) {
-					// Skip this duplicate pair
-					handledEdges.add(edge.id);
-					handledEdges.add(reverseEdge.id);
-					return;
-				}
-				
-				const uniqueId = `bidirectional-${pairKey}`;
-				seenBidirectionalPairs.add(pairKey);
-				
-				// Determine which edge is "forward" based on sorted order
-				const isForward = edge.source === sortedNodes[0];
-				
-				// Found bidirectional pair - merge them into a single bidirectional edge
-				processedEdges.push({
-					id: uniqueId,
-					source: edge.source,
-					target: edge.target,
-					type: 'bidirectional-curved', // Use custom edge type
-					data: {
-						forwardLabel: isForward ? edge.label : reverseEdge.label,
-						backwardLabel: isForward ? reverseEdge.label : edge.label,
-						source: edge.source,
-						target: edge.target,
-					},
-					style: this.getEdgeStyle(edge),
-				});
-
-				// Mark both edges as handled
-				handledEdges.add(edge.id);
-				handledEdges.add(reverseEdge.id);
-			} else {
-				// Regular unidirectional edge - keep as is
-				processedEdges.push({
-					id: edge.id,
-					source: edge.source,
-					target: edge.target,
-					label: edge.label,
-					style: this.getEdgeStyle(edge),
-					labelStyle: { fill: '#000', fontWeight: '500' },
-				});
-				handledEdges.add(edge.id);
-			}
-		});
-
-		return processedEdges;
-	}
-
-	private getEdgeStyle(edge: GraphEdge) {
-		if (edge.label === 'contains') {
-			return { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 };
-		}
-		if (edge.id.startsWith('c2_relationship')) {
-			return { stroke: '#059669', strokeWidth: 2 };
-		}
-		if (edge.id.startsWith('cross_c1_c2_rel')) {
-			return { stroke: '#d97706', strokeWidth: 2 };
-		}
-		return { stroke: '#374151', strokeWidth: 1 };
 	}
 }
