@@ -50,11 +50,28 @@ export class ReactFlowService {
 			}))
 		];
 
-		const reactFlowEdges = edges.map((edge) => ({
+		// Finding bidirectional edges
+		const edgeSet = new Set<string>();
+		edges.forEach((edge) => {
+			if (edge) edgeSet.add(`${edge.source}->${edge.target}`);
+		});
+
+		const bidirectionalPairs = new Set<string>();
+		edges.forEach((edge) => {
+			const reverseKey = `${edge.target}->${edge.source}`;
+			if (edgeSet.has(reverseKey)) {
+				bidirectionalPairs.add(`${edge.source}->${edge.target}`);
+			}
+		});
+
+		const reactFlowEdges = edges.map((edge) => {
+			const isBidirectional = bidirectionalPairs.has(`${edge.source}->${edge.target}`);	
+			return {
 			id: edge.id,
 			source: edge.source,
 			target: edge.target,
 			label: edge.label,
+			type: isBidirectional ? 'bidirectional' : 'default', 
 			style: edge.label === 'contains'
 				? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 } // Dashed light gray for containment
 				: edge.id.startsWith('c2_relationship')
@@ -63,7 +80,8 @@ export class ReactFlowService {
 				? { stroke: '#d97706', strokeWidth: 2 } // Dark orange for cross C1-C2 relationships
 				: { stroke: '#374151', strokeWidth: 1 }, // Dark gray for other edges
 			labelStyle: { fill: '#000', fontWeight: '500' },
-		}));
+			};
+		});
 
 		return {
 			nodes: reactFlowNodes,
