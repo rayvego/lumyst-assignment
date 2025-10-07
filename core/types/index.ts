@@ -2,6 +2,9 @@ export interface GraphNode {
 	id: string;
 	label: string;
 	position?: { x: number; y: number };
+	importanceScore?: number; // 0.0 to 1.0 - Task 5: utility detection
+	isUtility?: boolean; // Task 5: whether this is a utility function
+	confidence?: number; // Task 5: confidence in classification
 }
 
 export interface GraphEdge {
