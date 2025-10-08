@@ -175,22 +175,13 @@ export class GraphFormatService {
 		graphNodes: GraphNode[],
 		edges: GraphEdge[]
 	) {
-		// Spacing configuration
-		const C1_HORIZONTAL_SPACING = 800;
-		const C2_HORIZONTAL_SPACING = 600;
-		const NODE_HORIZONTAL_SPACING = 280;
-		const VERTICAL_SPACING_C1_TO_C2 = 250;
-		const VERTICAL_SPACING_C2_TO_NODE = 250;
-		const NODE_VERTICAL_SPACING = 180;
-
-		// Layer 1: C1 Categories
-		const positionedC1Nodes = c1Outputs.map((c1, idx) => ({
-			...c1,
-			position: {
-				x: idx * C1_HORIZONTAL_SPACING,
-				y: 0
-			}
-		}));
+		// Node dimensions (actual rendered sizes)
+		const NODE_WIDTH = 220;
+		const NODE_HEIGHT = 80;
+		
+		// Minimum spacing between node edges
+		const MIN_HORIZONTAL_GAP = 150;
+		const MIN_VERTICAL_GAP = 100;
 
 		// Group C2 nodes by their C1 parent
 		const c2ByC1 = new Map<string, C2Subcategory[]>();
@@ -201,24 +192,49 @@ export class GraphFormatService {
 			c2ByC1.get(c2.c1CategoryId)!.push(c2);
 		});
 
+		// Calculate required width for each C1 based on its C2 children
+		let currentX = 0;
+		const positionedC1Nodes: (C1Output & { position: { x: number; y: number } })[] = [];
+		const c1Positions = new Map<string, number>();
+
+		c1Outputs.forEach((c1) => {
+			const c2Children = c2ByC1.get(c1.id) || [];
+			const c2TotalWidth = c2Children.length > 0 
+				? (c2Children.length * NODE_WIDTH) + ((c2Children.length - 1) * MIN_HORIZONTAL_GAP)
+				: NODE_WIDTH;
+			
+			const c1X = currentX + c2TotalWidth / 2;
+			c1Positions.set(c1.id, c1X);
+			
+			positionedC1Nodes.push({
+				...c1,
+				position: { x: c1X, y: 0 }
+			});
+
+			// Move to next C1 position
+			currentX += c2TotalWidth + MIN_HORIZONTAL_GAP * 3;
+		});
+
 		// Layer 2: C2 Subcategories - positioned under their parent C1
 		const positionedC2Nodes: (C2Subcategory & { position: { x: number; y: number } })[] = [];
-		let c2GlobalIndex = 0;
+		const VERTICAL_SPACING_C1_TO_C2 = 300;
 
-		c1Outputs.forEach((c1, c1Index) => {
+		c1Outputs.forEach((c1) => {
 			const c2Children = c2ByC1.get(c1.id) || [];
-			const c1X = c1Index * C1_HORIZONTAL_SPACING;
+			if (c2Children.length === 0) return;
 
-			c2Children.forEach((c2, c2LocalIdx) => {
-				const c2X = c1X + (c2LocalIdx - (c2Children.length - 1) / 2) * C2_HORIZONTAL_SPACING;
+			const c1X = c1Positions.get(c1.id)!;
+			const c2TotalWidth = (c2Children.length * NODE_WIDTH) + ((c2Children.length - 1) * MIN_HORIZONTAL_GAP);
+			const startX = c1X - c2TotalWidth / 2;
+
+			c2Children.forEach((c2, idx) => {
 				positionedC2Nodes.push({
 					...c2,
 					position: {
-						x: c2X,
+						x: startX + (idx * (NODE_WIDTH + MIN_HORIZONTAL_GAP)),
 						y: VERTICAL_SPACING_C1_TO_C2
 					}
 				});
-				c2GlobalIndex++;
 			});
 		});
 
@@ -233,9 +249,11 @@ export class GraphFormatService {
 
 		// Layer 3: Individual nodes - positioned under their parent C2
 		const positionedGraphNodes: (GraphNode & { position: { x: number; y: number } })[] = [];
+		const VERTICAL_SPACING_C2_TO_NODE = 300;
 		
 		positionedC2Nodes.forEach(c2 => {
 			const children = nodesByC2.get(c2.id) || [];
+			if (children.length === 0) return;
 			
 			// Sort children by their connections to minimize edge lengths
 			const childAdjacency = new Map<string, Set<string>>();
@@ -251,18 +269,21 @@ export class GraphFormatService {
 			});
 			
 			const sortedChildren = this.greedySort(children, childAdjacency);
-			const nodesPerRow = Math.ceil(Math.sqrt(sortedChildren.length));
+			const nodesPerRow = Math.min(Math.ceil(Math.sqrt(sortedChildren.length)), 4);
 			
 			sortedChildren.forEach((node, idx) => {
 				const row = Math.floor(idx / nodesPerRow);
 				const col = idx % nodesPerRow;
 				const totalCols = Math.min(sortedChildren.length - row * nodesPerRow, nodesPerRow);
 				
+				const gridWidth = totalCols * NODE_WIDTH + (totalCols - 1) * MIN_HORIZONTAL_GAP;
+				const startX = c2.position.x - gridWidth / 2;
+				
 				positionedGraphNodes.push({
 					...node,
 					position: {
-						x: c2.position.x + (col - (totalCols - 1) / 2) * NODE_HORIZONTAL_SPACING,
-						y: VERTICAL_SPACING_C1_TO_C2 + VERTICAL_SPACING_C2_TO_NODE + row * NODE_VERTICAL_SPACING
+						x: startX + (col * (NODE_WIDTH + MIN_HORIZONTAL_GAP)),
+						y: VERTICAL_SPACING_C1_TO_C2 + VERTICAL_SPACING_C2_TO_NODE + row * (NODE_HEIGHT + MIN_VERTICAL_GAP)
 					}
 				});
 			});
