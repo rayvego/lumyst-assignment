@@ -40,6 +40,29 @@ export interface C2Relationship {
 	label: string;
 }
 
+export interface ReactFlowNode {
+	id: string;
+	position: { x: number; y: number };
+	data: {
+		label: string;
+		type?: string;
+		syntaxType?: string;
+		filePath?: string;
+		isAbstract?: boolean;
+		isOverride?: boolean;
+		categoryData?: {
+			c1Category?: string;
+			c2Name?: string;
+			nodesInCategory?: number;
+			nodeCount?: number;
+			categoryDescription?: string;
+			description?: string;
+		};
+	};
+	type?: string;
+	style?: Record<string, any>;
+}
+
 export interface CrossC1C2Relationship {
 	id: string;
 	fromC1: string;

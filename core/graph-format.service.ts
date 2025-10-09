@@ -18,19 +18,37 @@ export class GraphFormatService {
 		const dagreGraph = new dagre.graphlib.Graph();
 		dagreGraph.setDefaultEdgeLabel(() => ({}));
 
-		// Set up the graph
-		dagreGraph.setGraph({ rankdir: 'TB' });
+		// Set up the graph with increased spacing and broader layout
+		dagreGraph.setGraph({ 
+			rankdir: 'TB',
+			nodesep: 120,    // Horizontal spacing between nodes (increased from default 50)
+			ranksep: 100,    // Vertical spacing between ranks (increased from default 50)
+			marginx: 60,     // Horizontal margin
+			marginy: 60      // Vertical margin
+		});
 
-		// Add all nodes to dagre
+		// Add all nodes to dagre with larger dimensions for better spacing
 		const allNodes = [
 			...graphNodes,
 			...c1Outputs.map(c1 => ({ ...c1, type: 'c1' })),
 			...c2Subcategories.map(c2 => ({ ...c2, type: 'c2' }))
 		];
 
-
 		allNodes.forEach((node) => {
-			dagreGraph.setNode(node.id, { width: 150, height: 50 });
+			// Increase node dimensions for better spacing based on node type
+			let width = 160;  // Default for graph nodes
+			let height = 60;  // Default for graph nodes
+			
+			// Check if it's a C1 or C2 node by checking the arrays
+			if (c1Outputs.some(c1 => c1.id === node.id)) {
+				width = 200;
+				height = 80;
+			} else if (c2Subcategories.some(c2 => c2.id === node.id)) {
+				width = 180;
+				height = 70;
+			}
+			
+			dagreGraph.setNode(node.id, { width, height });
 		});
 
 		// Add all edges to dagre
@@ -93,14 +111,16 @@ export class GraphFormatService {
 		// Calculate layout
 		dagre.layout(dagreGraph);
 
-		// Apply positions to all nodes
+		// Apply positions to all nodes with additional spacing multiplier
+		const spacingMultiplier = 1.3; // Add 30% more space
+		
 		const positionedGraphNodes = graphNodes.map((node) => {
 			const nodeWithPosition = dagreGraph.node(node.id);
 			return {
 				...node,
 				position: {
-					x: nodeWithPosition.x - nodeWithPosition.width / 2,
-					y: nodeWithPosition.y - nodeWithPosition.height / 2,
+					x: (nodeWithPosition.x - nodeWithPosition.width / 2) * spacingMultiplier,
+					y: (nodeWithPosition.y - nodeWithPosition.height / 2) * spacingMultiplier,
 				},
 			};
 		});
@@ -110,8 +130,8 @@ export class GraphFormatService {
 			return {
 				...node,
 				position: {
-					x: nodeWithPosition.x - nodeWithPosition.width / 2,
-					y: nodeWithPosition.y - nodeWithPosition.height / 2,
+					x: (nodeWithPosition.x - nodeWithPosition.width / 2) * spacingMultiplier,
+					y: (nodeWithPosition.y - nodeWithPosition.height / 2) * spacingMultiplier,
 				},
 			};
 		});
@@ -121,8 +141,8 @@ export class GraphFormatService {
 			return {
 				...node,
 				position: {
-					x: nodeWithPosition.x - nodeWithPosition.width / 2,
-					y: nodeWithPosition.y - nodeWithPosition.height / 2,
+					x: (nodeWithPosition.x - nodeWithPosition.width / 2) * spacingMultiplier,
+					y: (nodeWithPosition.y - nodeWithPosition.height / 2) * spacingMultiplier,
 				},
 			};
 		});
