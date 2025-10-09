@@ -48,3 +48,13 @@ export interface CrossC1C2Relationship {
 	toC2: string;
 	label: string;
 }
+
+export interface ReactFlowNode {
+	id: string;
+	data: {
+		label: string;
+		[key: string]: any;
+	};
+	position: { x: number; y: number };
+	type?: string;
+}
