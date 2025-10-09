@@ -32,16 +32,28 @@ export function BidirectionalEdge({
   const deltaY = targetY - sourceY;
   const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
   
-  // If nodes are too close, use minimal curve
-  if (distance < 50) {
+  // Enhanced color scheme for better visibility
+  const getEdgeColor = () => {
+    if (label === 'contains') return '#6b7280'; // Gray for containment
+    if (id.includes('c2_relationship')) return '#059669'; // Green for C2 relationships
+    if (id.includes('cross_c1_c2_rel')) return '#d97706'; // Orange for cross relationships
+    return isReverse ? '#dc2626' : '#2563eb'; // Red for reverse, blue for forward
+  };
+  
+  const edgeColor = getEdgeColor();
+  
+  // If nodes are too close, use straight line with better styling
+  if (distance < 80) {
     const pathData = `M ${sourceX} ${sourceY} L ${targetX} ${targetY}`;
     return (
       <>
         <BaseEdge
           path={pathData}
           style={{
-            stroke: isReverse ? '#ef4444' : '#3b82f6',
-            strokeWidth: 2,
+            stroke: edgeColor,
+            strokeWidth: label === 'contains' ? 1.5 : 2.5,
+            strokeDasharray: label === 'contains' ? '6,4' : (isReverse ? '8,4' : 'none'),
+            strokeOpacity: 0.8,
             ...style,
           }}
           markerEnd={markerEnd}
@@ -51,17 +63,18 @@ export function BidirectionalEdge({
             style={{
               position: 'absolute',
               transform: `translate(-50%, -50%) translate(${(sourceX + targetX) / 2}px, ${(sourceY + targetY) / 2}px)`,
-              fontSize: 12,
-              fontWeight: 500,
-              background: 'white',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              border: `1px solid ${isReverse ? '#ef4444' : '#3b82f6'}`,
-              color: isReverse ? '#ef4444' : '#3b82f6',
+              fontSize: 11,
+              fontWeight: 600,
+              background: 'rgba(255, 255, 255, 0.95)',
+              padding: '3px 8px',
+              borderRadius: '6px',
+              border: `1.5px solid ${edgeColor}`,
+              color: edgeColor,
               pointerEvents: 'all',
               zIndex: 1000,
               whiteSpace: 'nowrap',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+              backdropFilter: 'blur(4px)',
             }}
             className="nodrag nopan"
           >
@@ -72,20 +85,20 @@ export function BidirectionalEdge({
     );
   }
   
-  // Calculate perpendicular offset for bidirectional edges
-  const offsetDistance = Math.min(30, distance * 0.2); // Dynamic offset based on distance
+  // Enhanced curve calculation for better visual separation
+  const offsetDistance = Math.max(25, Math.min(50, distance * 0.25)); // Improved offset calculation
   
   // Calculate perpendicular vector (normalized)
   const perpX = -deltaY / distance;
   const perpY = deltaX / distance;
   
-  // Apply offset based on direction (forward vs reverse)
+  // Apply offset based on direction with improved separation
   const offset = isReverse ? -offsetDistance : offsetDistance;
   const offsetX = perpX * offset;
   const offsetY = perpY * offset;
   
-  // Calculate control point for quadratic Bézier curve
-  // Place it at the midpoint with perpendicular offset
+  // Create smoother curve with better control point positioning
+  const controlPointDistance = distance * 0.6; // More pronounced curve
   const midX = (sourceX + targetX) / 2 + offsetX;
   const midY = (sourceY + targetY) / 2 + offsetY;
   
@@ -97,13 +110,28 @@ export function BidirectionalEdge({
   const labelX = (1 - t) * (1 - t) * sourceX + 2 * (1 - t) * t * midX + t * t * targetX;
   const labelY = (1 - t) * (1 - t) * sourceY + 2 * (1 - t) * t * midY + t * t * targetY;
   
-  // Determine edge color and style based on direction
-  const edgeColor = isReverse ? '#ef4444' : '#3b82f6'; // red for reverse, blue for forward
+  // Enhanced edge styling for better clarity
+  const getStrokeWidth = () => {
+    if (label === 'contains') return 1.5;
+    if (id.includes('c2_relationship')) return 2.5;
+    if (id.includes('cross_c1_c2_rel')) return 2.5;
+    return 2;
+  };
+  
+  const getStrokeDashArray = () => {
+    if (label === 'contains') return '6,4';
+    if (isReverse) return '8,4';
+    return 'none';
+  };
+  
   const edgeStyle = {
     stroke: edgeColor,
-    strokeWidth: 2,
+    strokeWidth: getStrokeWidth(),
     fill: 'none',
-    strokeDasharray: isReverse ? '8,4' : 'none', // Dashed for reverse edges
+    strokeDasharray: getStrokeDashArray(),
+    strokeOpacity: 0.85,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
     ...style,
   };
 
@@ -119,18 +147,19 @@ export function BidirectionalEdge({
           style={{
             position: 'absolute',
             transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
-            fontSize: 12,
-            fontWeight: 500,
-            background: 'white',
-            padding: '2px 6px',
-            borderRadius: '4px',
-            border: `1px solid ${edgeColor}`,
+            fontSize: 11,
+            fontWeight: 600,
+            background: 'rgba(255, 255, 255, 0.95)',
+            padding: '3px 8px',
+            borderRadius: '6px',
+            border: `1.5px solid ${edgeColor}`,
             color: edgeColor,
             pointerEvents: 'all',
             zIndex: 1000,
             whiteSpace: 'nowrap',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            maxWidth: '120px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+            backdropFilter: 'blur(4px)',
+            maxWidth: '140px',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}

@@ -56,14 +56,12 @@ export class ReactFlowService {
 			source: edge.source,
 			target: edge.target,
 			label: edge.label,
-			style: edge.label === 'contains'
-				? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 } // Dashed light gray for containment
-				: edge.id.startsWith('c2_relationship')
-				? { stroke: '#059669', strokeWidth: 2 } // Dark green for C2-C2 relationships
-				: edge.id.startsWith('cross_c1_c2_rel')
-				? { stroke: '#d97706', strokeWidth: 2 } // Dark orange for cross C1-C2 relationships
-				: { stroke: '#374151', strokeWidth: 1 }, // Dark gray for other edges
-			labelStyle: { fill: '#000', fontWeight: '500' },
+			// Remove redundant styling - let the bidirectional edge component handle all styling
+			animated: false,
+			labelStyle: { 
+				fill: 'transparent', // Hide default label since we render custom ones
+				fontSize: 0,
+			},
 		}));
 
 		// Process edges for bidirectional visualization
