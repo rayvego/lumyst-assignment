@@ -1,14 +1,15 @@
 "use client";
 
-import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow } from "@xyflow/react";
+import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow, Background, Controls, MiniMap } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useMemo, useState } from "react";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
-import { GraphFormatService } from "../core/graph-format.service";
+import { HierarchicalLayoutService } from "../core/hierarchical-layout.service";
 import { ReactFlowService } from "../core/react-flow.service";
-import CurvedEdge from "../components/curved-edge";
+import EnhancedCurvedEdge from "../components/enhanced-curved-edge";
+import { GroupBackground } from "../components/group-background";
 
-const graphFormatService = new GraphFormatService();
+const hierarchicalLayoutService = new HierarchicalLayoutService();
 const reactFlowService = new ReactFlowService();
 
 const {
@@ -20,7 +21,7 @@ const {
 	crossC1C2Relationships
 } = convertDataToGraphNodesAndEdges();
 
-const layoutedData = graphFormatService.layoutCategoriesWithNodes(
+const layoutedData = hierarchicalLayoutService.layoutCategoriesWithNodes(
 	graphNodes,
 	graphEdges,
 	c1Output,
@@ -43,7 +44,8 @@ export default function App() {
 	// Define custom edge types
 	const edgeTypes = useMemo(
 		() => ({
-			default: CurvedEdge,
+			enhanced: EnhancedCurvedEdge,
+			default: EnhancedCurvedEdge,
 		}),
 		[]
 	);
@@ -62,7 +64,7 @@ export default function App() {
 	);
 
 	return (
-		<div style={{ width: "100vw", height: "100vh", background: "white" }}>
+		<div style={{ width: "100vw", height: "100vh", background: "#fafafa" }}>
 			<ReactFlow
 				nodes={nodes}
 				edges={edges}
@@ -71,10 +73,26 @@ export default function App() {
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
 				fitView
-				minZoom={0.1}
+				minZoom={0.05}
 				maxZoom={2}
-				style={{ background: "white" }}
-			/>
+				style={{ background: "#fafafa" }}
+				defaultEdgeOptions={{
+					type: 'enhanced',
+				}}
+			>
+				<Background color="#e5e7eb" gap={16} />
+				<Controls />
+				<MiniMap 
+					nodeColor={(node) => {
+						if (node.style?.background) return node.style.background as string;
+						return '#dbeafe';
+					}}
+					maskColor="rgba(0, 0, 0, 0.1)"
+				/>
+				{layoutedData.groupBounds && (
+					<GroupBackground bounds={layoutedData.groupBounds} />
+				)}
+			</ReactFlow>
 		</div>
 	);
 }
