@@ -10,10 +10,10 @@ export class LayoutConfigService {
     switch (preset) {
       case 'compact':
         return {
-          levelHeight: 180,
-          nodeSpacing: 140,
-          clusterSpacing: 220,
-          minimumNodeDistance: 90,
+          levelHeight: 220,
+          nodeSpacing: 200,
+          clusterSpacing: 300,
+          minimumNodeDistance: 130,
           edgeLengthMultiplier: 1.2,
           centralityWeight: 0.4,
           forceDirectedIterations: 50
@@ -21,10 +21,10 @@ export class LayoutConfigService {
 
       case 'spacious':
         return {
-          levelHeight: 280,
-          nodeSpacing: 220,
-          clusterSpacing: 350,
-          minimumNodeDistance: 150,
+          levelHeight: 320,
+          nodeSpacing: 280,
+          clusterSpacing: 450,
+          minimumNodeDistance: 200,
           edgeLengthMultiplier: 1.8,
           centralityWeight: 0.2,
           forceDirectedIterations: 80
@@ -32,10 +32,10 @@ export class LayoutConfigService {
 
       case 'hierarchical':
         return {
-          levelHeight: 250,
-          nodeSpacing: 180,
-          clusterSpacing: 300,
-          minimumNodeDistance: 120,
+          levelHeight: 300,
+          nodeSpacing: 240,
+          clusterSpacing: 400,
+          minimumNodeDistance: 160,
           edgeLengthMultiplier: 1.5,
           centralityWeight: 0.3,
           forceDirectedIterations: 100
@@ -43,10 +43,10 @@ export class LayoutConfigService {
 
       case 'clustered':
         return {
-          levelHeight: 220,
-          nodeSpacing: 160,
-          clusterSpacing: 400,
-          minimumNodeDistance: 110,
+          levelHeight: 280,
+          nodeSpacing: 220,
+          clusterSpacing: 500,
+          minimumNodeDistance: 150,
           edgeLengthMultiplier: 1.4,
           centralityWeight: 0.5,
           forceDirectedIterations: 120
@@ -54,10 +54,10 @@ export class LayoutConfigService {
 
       case 'radial':
         return {
-          levelHeight: 200,
-          nodeSpacing: 170,
-          clusterSpacing: 320,
-          minimumNodeDistance: 100,
+          levelHeight: 260,
+          nodeSpacing: 230,
+          clusterSpacing: 420,
+          minimumNodeDistance: 140,
           edgeLengthMultiplier: 1.6,
           centralityWeight: 0.6,
           forceDirectedIterations: 150
@@ -81,10 +81,10 @@ export class LayoutConfigService {
     } else {
       // For large graphs like your 20k LOC codebase - increased spacing
       return {
-        levelHeight: 320,
-        nodeSpacing: 200,
-        clusterSpacing: 500,
-        minimumNodeDistance: 130,
+        levelHeight: 380,
+        nodeSpacing: 280,
+        clusterSpacing: 600,
+        minimumNodeDistance: 180,
         edgeLengthMultiplier: 1.6,
         centralityWeight: 0.4,
         forceDirectedIterations: 80 // Fewer iterations for performance
@@ -111,10 +111,10 @@ export class LayoutConfigService {
    */
   static getReadabilityOptimizedConfig(): LayoutConfig {
     return {
-      levelHeight: 300,
-      nodeSpacing: 240,
-      clusterSpacing: 450,
-      minimumNodeDistance: 160,
+      levelHeight: 360,
+      nodeSpacing: 300,
+      clusterSpacing: 550,
+      minimumNodeDistance: 200,
       edgeLengthMultiplier: 2.0,
       centralityWeight: 0.3,
       forceDirectedIterations: 150
