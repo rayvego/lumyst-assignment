@@ -1,6 +1,13 @@
 import type { GraphNode, GraphEdge, C1Output, C2Subcategory } from './types';
+import { BidirectionalEdgeService } from './bidirectional-edge.service';
 
 export class ReactFlowService {
+	private bidirectionalEdgeService: BidirectionalEdgeService;
+
+	constructor() {
+		this.bidirectionalEdgeService = new BidirectionalEdgeService();
+	}
+
 	convertDataToReactFlowDataTypes(
 		graphNodes: GraphNode[],
 		c1Nodes: C1Output[],
@@ -50,7 +57,8 @@ export class ReactFlowService {
 			}))
 		];
 
-		const reactFlowEdges = edges.map((edge) => ({
+		// Create base edges with styling
+		const baseEdges = edges.map((edge) => ({
 			id: edge.id,
 			source: edge.source,
 			target: edge.target,
@@ -65,9 +73,15 @@ export class ReactFlowService {
 			labelStyle: { fill: '#000', fontWeight: '500' },
 		}));
 
+		// Apply bidirectional edge handling
+		const processedEdges = this.bidirectionalEdgeService.processBidirectionalEdges(
+			edges,
+			baseEdges
+		);
+
 		return {
 			nodes: reactFlowNodes,
-			edges: reactFlowEdges,
+			edges: processedEdges,
 		};
 	}
 }
