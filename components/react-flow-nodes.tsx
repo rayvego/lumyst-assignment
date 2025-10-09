@@ -1,5 +1,22 @@
 import { Handle, Position } from "@xyflow/react";
-import type { ReactFlowNode } from "../core/types";
+type CategoryData = {
+  c1Category?: string;
+  c2Name?: string;
+  nodesInCategory?: number;
+  nodeCount?: number;
+  categoryDescription?: string;
+  description?: string;
+};
+type GraphNodeData = {
+  label: string;
+  type?: string;
+  syntaxType?: string;
+  filePath?: string;
+  isAbstract?: boolean;
+  isOverride?: boolean;
+  categoryData?: CategoryData;
+};
+type ReactFlowNode = { data: GraphNodeData };
 
 interface BaseNodeProps {
 	data: ReactFlowNode["data"];
@@ -20,12 +37,10 @@ interface CategoryNodeProps extends BaseNodeProps {
 }
 
 // C1 Category Node Component
-export function C1CategoryNode({ data, selected }: CategoryNodeProps) {
+export function C1CategoryNode({ data }: CategoryNodeProps) {
 	return (
 		<div
-			className={`bg-gradient-to-br from-purple-600 to-purple-800 border-2 border-purple-400 rounded-lg p-3 shadow-lg hover:shadow-xl hover:from-purple-500 hover:to-purple-700 transition-all cursor-pointer min-w-[180px] max-w-[240px] w-[220px] overflow-hidden ${
-				selected ? "ring-2 ring-purple-300" : ""
-			}`}
+            className={"bg-gradient-to-br from-purple-600 to-purple-800 border-2 border-purple-400 rounded-lg p-3 shadow-lg hover:shadow-xl hover:from-purple-500 hover:to-purple-700 transition-all cursor-pointer min-w-[180px] max-w-[240px] w-[220px] overflow-hidden"}
 		>
 			<Handle type="target" position={Position.Top} className="w-3 h-3 bg-purple-300" />
 
@@ -48,12 +63,10 @@ export function C1CategoryNode({ data, selected }: CategoryNodeProps) {
 }
 
 // C2 Subcategory Node Component
-export function C2SubcategoryNode({ data, selected }: CategoryNodeProps) {
+export function C2SubcategoryNode({ data }: CategoryNodeProps) {
 	return (
 		<div
-			className={`bg-gradient-to-br from-indigo-600 to-indigo-800 border-2 border-indigo-400 rounded-lg p-3 shadow-lg hover:shadow-xl hover:from-indigo-500 hover:to-indigo-700 transition-all cursor-pointer min-w-[160px] max-w-[220px] w-[220px] overflow-hidden ${
-				selected ? "ring-2 ring-indigo-300" : ""
-			}`}
+            className={"bg-gradient-to-br from-indigo-600 to-indigo-800 border-2 border-indigo-400 rounded-lg p-3 shadow-lg hover:shadow-xl hover:from-indigo-500 hover:to-indigo-700 transition-all cursor-pointer min-w-[160px] max-w-[220px] w-[220px] overflow-hidden"}
 		>
 			<Handle type="target" position={Position.Top} className="w-3 h-3 bg-indigo-300" />
 
@@ -76,7 +89,7 @@ export function C2SubcategoryNode({ data, selected }: CategoryNodeProps) {
 }
 
 // Graph Node Component (for individual code elements)
-export function GraphNode({ data, selected }: BaseNodeProps) {
+export function GraphNode({ data }: BaseNodeProps) {
 	// Get colors based on node type - matching formatService.ts
 	const getNodeColors = (nodeType: string) => {
 		switch (nodeType) {
@@ -135,7 +148,7 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
 		}
 	};
 
-	const colors = getNodeColors(data.type);
+    const colors = getNodeColors(data.type ?? "");
 
 	return (
 		<div
