@@ -18,6 +18,7 @@ export interface C1Output {
 	nodesInCategory: number;
 	nodeIds: string[];
 	position?: { x: number; y: number };
+	bounds?: { width: number; height: number };
 }
 
 export interface C2Subcategory {
@@ -30,6 +31,7 @@ export interface C2Subcategory {
 	nodeCount: number;
 	nodeIds: string[];
 	position?: { x: number; y: number };
+	bounds?: { width: number; height: number };
 }
 
 export interface C2Relationship {
