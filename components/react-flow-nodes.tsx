@@ -1,13 +1,13 @@
 import { Handle, Position } from "@xyflow/react";
-import type { ReactFlowNode } from "../core/types";
+import type { Node } from "@xyflow/react";
 
 interface BaseNodeProps {
-	data: ReactFlowNode["data"];
+	data: Node["data"];
 	selected?: boolean;
 }
 
 interface CategoryNodeProps extends BaseNodeProps {
-	data: ReactFlowNode["data"] & {
+	data: Node["data"] & {
 		categoryData?: {
 			c1Category?: string;
 			c2Name?: string;
@@ -20,12 +20,10 @@ interface CategoryNodeProps extends BaseNodeProps {
 }
 
 // C1 Category Node Component
-export function C1CategoryNode({ data, selected }: CategoryNodeProps) {
+export function C1CategoryNode({ data }: CategoryNodeProps) {
 	return (
 		<div
-			className={`bg-gradient-to-br from-purple-600 to-purple-800 border-2 border-purple-400 rounded-lg p-3 shadow-lg hover:shadow-xl hover:from-purple-500 hover:to-purple-700 transition-all cursor-pointer min-w-[180px] max-w-[240px] w-[220px] overflow-hidden ${
-				selected ? "ring-2 ring-purple-300" : ""
-			}`}
+			className="bg-gradient-to-br from-purple-600 to-purple-800 border-2 border-purple-400 rounded-lg p-3 shadow-lg hover:shadow-xl hover:from-purple-500 hover:to-purple-700 transition-all cursor-pointer min-w-[180px] max-w-[240px] w-[220px] overflow-hidden"
 		>
 			<Handle type="target" position={Position.Top} className="w-3 h-3 bg-purple-300" />
 
@@ -34,9 +32,9 @@ export function C1CategoryNode({ data, selected }: CategoryNodeProps) {
 				<div className="flex-1 min-w-0">
 					<h3
 						className="font-semibold text-white text-sm line-clamp-2"
-						title={data.categoryData?.c1Category || data.label}
+						title={String(data.categoryData?.c1Category || data.label)}
 					>
-						{data.categoryData?.c1Category || data.label}
+						{String(data.categoryData?.c1Category || data.label)}
 					</h3>
 					<p className="text-purple-200 text-xs">{data.categoryData?.nodesInCategory || 0} nodes</p>
 				</div>
@@ -62,9 +60,9 @@ export function C2SubcategoryNode({ data, selected }: CategoryNodeProps) {
 				<div className="flex-1 min-w-0">
 					<h4
 						className="font-semibold text-white text-sm line-clamp-2"
-						title={data.categoryData?.c2Name || data.label}
+						title={String(data.categoryData?.c2Name || data.label)}
 					>
-						{data.categoryData?.c2Name || data.label}
+						{String(data.categoryData?.c2Name || data.label)}
 					</h4>
 					<p className="text-indigo-200 text-xs">{data.categoryData?.nodeCount || 0} nodes</p>
 				</div>
@@ -135,7 +133,7 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
 		}
 	};
 
-	const colors = getNodeColors(data.type);
+	const colors = getNodeColors(String(data.type || 'code'));
 
 	return (
 		<div
@@ -158,23 +156,23 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
 					style={{ backgroundColor: colors.handle }}
 				/>
 				<div className="flex-1 min-w-0">
-					<h4 className="font-semibold text-white text-sm line-clamp-2" title={data.label}>
-						{data.label}
+					<h4 className="font-semibold text-white text-sm line-clamp-2" title={String(data.label)}>
+						{String(data.label)}
 					</h4>
 					<p className="text-xs" style={{ color: colors.text }}>
-						{data.syntaxType || data.type}
+						{String(data.syntaxType || data.type || 'code')}
 					</p>
-					{data.filePath && (
-						<p className="text-xs truncate" style={{ color: colors.text }} title={data.filePath}>
-							{data.filePath.split("/").pop()}
+					{String(data.filePath || '') && (
+						<p className="text-xs truncate" style={{ color: colors.text }} title={String(data.filePath)}>
+							{String(data.filePath).split("/").pop()}
 						</p>
 					)}
-					{data.isAbstract && (
+					{Boolean(data.isAbstract) && (
 						<p className="text-xs font-medium" style={{ color: colors.text }}>
 							Abstract
 						</p>
 					)}
-					{data.isOverride && (
+					{Boolean(data.isOverride) && (
 						<p className="text-xs font-medium" style={{ color: colors.text }}>
 							Override
 						</p>
