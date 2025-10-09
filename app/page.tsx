@@ -2,10 +2,11 @@
 
 import { addEdge, applyEdgeChanges, applyNodeChanges, ReactFlow } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
 import { GraphFormatService } from "../core/graph-format.service";
 import { ReactFlowService } from "../core/react-flow.service";
+import CurvedEdge from "../components/curved-edge";
 
 const graphFormatService = new GraphFormatService();
 const reactFlowService = new ReactFlowService();
@@ -39,6 +40,14 @@ export default function App() {
 	const [nodes, setNodes] = useState(initialNodes);
 	const [edges, setEdges] = useState(initialEdges);
 
+	// Define custom edge types
+	const edgeTypes = useMemo(
+		() => ({
+			default: CurvedEdge,
+		}),
+		[]
+	);
+
 	const onNodesChange = useCallback(
 		(changes: any) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
 		[],
@@ -57,6 +66,7 @@ export default function App() {
 			<ReactFlow
 				nodes={nodes}
 				edges={edges}
+				edgeTypes={edgeTypes}
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
