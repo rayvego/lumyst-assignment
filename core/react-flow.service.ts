@@ -104,7 +104,7 @@ export class ReactFlowService {
         id: edge.id,
         source: edge.source,
         target: edge.target,
-        label: undefined,
+        label: edge.label,
         type: edgeType,
         style: edgeStyle,
         animated: edgeStyle.animated,
