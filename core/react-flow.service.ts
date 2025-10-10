@@ -50,20 +50,50 @@ export class ReactFlowService {
 			}))
 		];
 
-		const reactFlowEdges = edges.map((edge) => ({
-			id: edge.id,
-			source: edge.source,
-			target: edge.target,
-			label: edge.label,
-			style: edge.label === 'contains'
-				? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 } // Dashed light gray for containment
+		// Build a quick lookup to detect reverse-direction pairs
+		const hasReverse = new Set<string>();
+		for (const e of edges) {
+			hasReverse.add(`${e.source}__${e.target}`);
+		}
+
+		const reactFlowEdges = edges.map((edge) => {
+			const style = edge.label === 'contains'
+				? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 }
 				: edge.id.startsWith('c2_relationship')
-				? { stroke: '#059669', strokeWidth: 2 } // Dark green for C2-C2 relationships
+				? { stroke: '#059669', strokeWidth: 2 }
 				: edge.id.startsWith('cross_c1_c2_rel')
-				? { stroke: '#d97706', strokeWidth: 2 } // Dark orange for cross C1-C2 relationships
-				: { stroke: '#374151', strokeWidth: 1 }, // Dark gray for other edges
-			labelStyle: { fill: '#000', fontWeight: '500' },
-		}));
+				? { stroke: '#d97706', strokeWidth: 2 }
+				: { stroke: '#374151', strokeWidth: 1 };
+
+			// Determine if this edge is part of a bidirectional pair (excluding containment edges)
+			const isContainment = edge.label === 'contains';
+			const reverseKey = `${edge.target}__${edge.source}`;
+			const isBidirectional = !isContainment && hasReverse.has(reverseKey);
+
+			if (isBidirectional) {
+				// Assign opposite sides deterministically so the two edges never overlap
+				const sign = edge.source < edge.target ? 1 : -1;
+				return {
+					id: edge.id,
+					source: edge.source,
+					target: edge.target,
+					label: undefined, // label will be rendered by custom edge via data.label
+					type: 'bidirectional',
+					data: { label: edge.label, offset: sign },
+					style,
+					labelStyle: { fill: '#000', fontWeight: '500' },
+				};
+			}
+
+			return {
+				id: edge.id,
+				source: edge.source,
+				target: edge.target,
+				label: edge.label,
+				style,
+				labelStyle: { fill: '#000', fontWeight: '500' },
+			};
+		});
 
 		return {
 			nodes: reactFlowNodes,
