@@ -6,6 +6,8 @@ import { useCallback, useState } from "react";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
 import { GraphFormatService } from "../core/graph-format.service";
 import { ReactFlowService } from "../core/react-flow.service";
+import { BidirectionalEdge } from "../components/ui/bidirectional-edge";
+
 
 const graphFormatService = new GraphFormatService();
 const reactFlowService = new ReactFlowService();
@@ -35,6 +37,8 @@ const { nodes: initialNodes, edges: initialEdges } = reactFlowService.convertDat
 	layoutedData.edges,
 );
 
+const edgeTypes = { bidirectional: BidirectionalEdge };
+
 export default function App() {
 	const [nodes, setNodes] = useState(initialNodes);
 	const [edges, setEdges] = useState(initialEdges);
@@ -60,6 +64,7 @@ export default function App() {
 				onNodesChange={onNodesChange}
 				onEdgesChange={onEdgesChange}
 				onConnect={onConnect}
+				edgeTypes={edgeTypes}
 				fitView
 				minZoom={0.1}
 				maxZoom={2}
