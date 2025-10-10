@@ -1,7 +1,9 @@
 export interface GraphNode {
 	id: string;
 	label: string;
+	type: string;
 	position?: { x: number; y: number };
+	isCollapsed: boolean | false;
 }
 
 export interface GraphEdge {
