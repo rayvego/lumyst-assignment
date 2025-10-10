@@ -80,8 +80,8 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
 	// Get colors based on node type - matching formatService.ts
 	const getNodeColors = (nodeType: string) => {
 		switch (nodeType) {
-			case "class":
-			case "interface":
+			case "Class":
+			case "Interface":
 				return {
 					from: "#7c3aed", // purple-600
 					to: "#5b21b6", // purple-800
@@ -89,9 +89,9 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
 					handle: "#ddd6fe", // purple-200
 					text: "#e9d5ff", // purple-200
 				};
-			case "method":
-			case "function":
-			case "constructor":
+			case "Method":
+			case "Function":
+			case "Constructor":
 				return {
 					from: "#f59e0b", // amber-500
 					to: "#d97706", // amber-600
@@ -99,30 +99,13 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
 					handle: "#fde68a", // amber-200
 					text: "#fde68a", // amber-200
 				};
-			case "variable":
-			case "property":
-				return {
-					from: "#ef4444", // red-500
-					to: "#dc2626", // red-600
-					border: "#f87171", // red-400
-					handle: "#fecaca", // red-200
-					text: "#fecaca", // red-200
-				};
-			case "file":
+			case "File":
 				return {
 					from: "#10b981", // emerald-500
 					to: "#059669", // emerald-600
 					border: "#34d399", // emerald-400
 					handle: "#a7f3d0", // emerald-200
 					text: "#a7f3d0", // emerald-200
-				};
-			case "folder":
-				return {
-					from: "#0ea5e9", // sky-500
-					to: "#0284c7", // sky-600
-					border: "#38bdf8", // sky-400
-					handle: "#bae6fd", // sky-200
-					text: "#bae6fd", // sky-200
 				};
 			default:
 				return {
@@ -162,23 +145,8 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
 						{data.label}
 					</h4>
 					<p className="text-xs" style={{ color: colors.text }}>
-						{data.syntaxType || data.type}
+						{data.type}
 					</p>
-					{data.filePath && (
-						<p className="text-xs truncate" style={{ color: colors.text }} title={data.filePath}>
-							{data.filePath.split("/").pop()}
-						</p>
-					)}
-					{data.isAbstract && (
-						<p className="text-xs font-medium" style={{ color: colors.text }}>
-							Abstract
-						</p>
-					)}
-					{data.isOverride && (
-						<p className="text-xs font-medium" style={{ color: colors.text }}>
-							Override
-						</p>
-					)}
 				</div>
 			</div>
 

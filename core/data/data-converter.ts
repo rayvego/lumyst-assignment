@@ -6,7 +6,7 @@ import type {
 	GraphEdge,
 	GraphNode,
 } from "../types";
-import analysisData from "./analysis.json";
+import analysisData from "./analysis-with-code.json";
 
 export function convertDataToGraphNodesAndEdges(): {
 	graphNodes: GraphNode[];
@@ -16,19 +16,23 @@ export function convertDataToGraphNodesAndEdges(): {
 	c2Relationships: C2Relationship[];
 	crossC1C2Relationships: CrossC1C2Relationship[];
 } {
-	const graphNodes: GraphNode[] = analysisData.analysisData.graphNodes.map((node) => ({
+	const data = analysisData.analysisData || {};
+
+	const graphNodes: GraphNode[] = (data.graphNodes || []).map((node: any) => ({
 		id: node.id,
 		label: node.label,
+        code: node.code,
+        type: node.type,
 	}));
 
-	const graphEdges: GraphEdge[] = analysisData.analysisData.graphEdges.map((edge) => ({
+	const graphEdges: GraphEdge[] = (data.graphEdges || []).map((edge: any) => ({
 		id: edge.id,
 		source: edge.source,
 		target: edge.target,
 		label: edge.label ?? "",
 	}));
 
-	const c1Output: C1Output[] = analysisData.analysisData.c1Output.map((output) => ({
+	const c1Output: C1Output[] = (data.c1Output || []).map((output: any) => ({
 		id: output.id,
 		label: output.c1Category,
 		c1Category: output.c1Category,
@@ -36,8 +40,8 @@ export function convertDataToGraphNodesAndEdges(): {
 		nodeIds: output.nodeIds,
 	}));
 
-	const c2Subcategories: C2Subcategory[] = analysisData.analysisData.c2Subcategories.map(
-		(subcategory) => ({
+	const c2Subcategories: C2Subcategory[] = (data.c2Subcategories || []).map(
+		(subcategory: any) => ({
 			id: subcategory.id,
 			label: subcategory.c2Name,
 			c1CategoryId: subcategory.c1CategoryId,
@@ -49,8 +53,8 @@ export function convertDataToGraphNodesAndEdges(): {
 		}),
 	);
 
-	const c2Relationships: C2Relationship[] = analysisData.analysisData.c2Relationships.map(
-		(relationship) => ({
+	const c2Relationships: C2Relationship[] = (data.c2Relationships || []).map(
+		(relationship: any) => ({
 			id: relationship.id,
 			label: relationship.relationshipType,
 			fromC2: relationship.fromC2,
@@ -60,7 +64,7 @@ export function convertDataToGraphNodesAndEdges(): {
 	);
 
 	const crossC1C2Relationships: CrossC1C2Relationship[] =
-		analysisData.analysisData.crossC1C2Relationships.map((relationship) => ({
+		(data.crossC1C2Relationships || []).map((relationship: any) => ({
 			id: relationship.id,
 			label: relationship.relationshipType,
 			fromC1: relationship.fromC1,

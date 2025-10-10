@@ -2,6 +2,8 @@ export interface GraphNode {
 	id: string;
 	label: string;
 	position?: { x: number; y: number };
+    code?: string;
+    type?: string;
 }
 
 export interface GraphEdge {
@@ -9,6 +11,7 @@ export interface GraphEdge {
 	source: string;
 	target: string;
 	label: string;
+    data?: { [key: string]: any };
 }
 
 export interface C1Output {
@@ -47,4 +50,23 @@ export interface CrossC1C2Relationship {
 	toC1: string;
 	toC2: string;
 	label: string;
+}
+
+export interface ReactFlowNode {
+    id: string;
+    position: { x: number; y: number };
+    data: {
+        label: string;
+        type?: string;
+        code?: string;
+        categoryData?: {
+            c1Category?: string;
+            c2Name?: string;
+            nodesInCategory?: number;
+            nodeCount?: number;
+            categoryDescription?: string;
+            description?: string;
+        };
+    };
+    type: string;
 }
