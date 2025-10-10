@@ -6,65 +6,73 @@ import { useCallback, useState } from "react";
 import { convertDataToGraphNodesAndEdges } from "../core/data/data-converter";
 import { GraphFormatService } from "../core/graph-format.service";
 import { ReactFlowService } from "../core/react-flow.service";
+// 1. Import the custom edge component
+import { CustomBidirectionalEdge } from "../components/react-flow-nodes"; 
 
 const graphFormatService = new GraphFormatService();
 const reactFlowService = new ReactFlowService();
 
 const {
-	graphNodes,
-	graphEdges,
-	c1Output,
-	c2Subcategories,
-	c2Relationships,
-	crossC1C2Relationships
+    graphNodes,
+    graphEdges,
+    c1Output,
+    c2Subcategories,
+    c2Relationships,
+    crossC1C2Relationships
 } = convertDataToGraphNodesAndEdges();
 
 const layoutedData = graphFormatService.layoutCategoriesWithNodes(
-	graphNodes,
-	graphEdges,
-	c1Output,
-	c2Subcategories,
-	c2Relationships,
-	crossC1C2Relationships
+    graphNodes,
+    graphEdges,
+    c1Output,
+    c2Subcategories,
+    c2Relationships,
+    crossC1C2Relationships
 );
 
 const { nodes: initialNodes, edges: initialEdges } = reactFlowService.convertDataToReactFlowDataTypes(
-	layoutedData.graphNodes,
-	layoutedData.c1Nodes,
-	layoutedData.c2Nodes,
-	layoutedData.edges,
+    layoutedData.graphNodes,
+    layoutedData.c1Nodes,
+    layoutedData.c2Nodes,
+    layoutedData.edges,
 );
 
+// 2. Define the custom edge types map
+const edgeTypes = {
+  bidirectional: CustomBidirectionalEdge,
+};
+
 export default function App() {
-	const [nodes, setNodes] = useState(initialNodes);
-	const [edges, setEdges] = useState(initialEdges);
+    const [nodes, setNodes] = useState(initialNodes);
+    const [edges, setEdges] = useState(initialEdges);
 
-	const onNodesChange = useCallback(
-		(changes: any) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
-		[],
-	);
-	const onEdgesChange = useCallback(
-		(changes: any) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
-		[],
-	);
-	const onConnect = useCallback(
-		(params: any) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
-		[],
-	);
+    const onNodesChange = useCallback(
+        (changes: any) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
+        [],
+    );
+    const onEdgesChange = useCallback(
+        (changes: any) => setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
+        [],
+    );
+    const onConnect = useCallback(
+        (params: any) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
+        [],
+    );
 
-	return (
-		<div style={{ width: "100vw", height: "100vh", background: "white" }}>
-			<ReactFlow
-				nodes={nodes}
-				edges={edges}
-				onNodesChange={onNodesChange}
-				onEdgesChange={onEdgesChange}
-				onConnect={onConnect}
-				fitView
-				minZoom={0.1}
-				maxZoom={2}
-				style={{ background: "white" }}
-			/>
-		</div>
-	);
+    return (
+        <div style={{ width: "100vw", height: "100vh", background: "white" }}>
+            <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                edgeTypes={edgeTypes} // 3. Pass the custom edge types here
+                fitView
+                minZoom={0.1}
+                maxZoom={2}
+                style={{ background: "white" }}
+            />
+        </div>
+    );
 }
