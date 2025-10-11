@@ -11,6 +11,7 @@ export interface ReactFlowNode {
     [key: string]: any;
   };
   type: string; //stub?
+  hidden?: boolean;
   style: {
     background: string;
     border: string;
@@ -23,6 +24,7 @@ export interface ReactFlowEdge {
   source: string;
   target: string;
   label: string;
+  hidden?: boolean;
   style:
     | {
         stroke: string;
@@ -79,7 +81,7 @@ export class ReactFlowService {
         id: node.id,
         position: node.position || { x: 0, y: 0 },
         data: { label: node.label, id: node.id },
-        type: node.type || "default",
+        type: node.type || "node",
         style: style[node.type] || defaultNodeStyle,
       })),
       // C1 category nodes
@@ -116,6 +118,7 @@ export class ReactFlowService {
       source: edge.source,
       target: edge.target,
       label: edge.label,
+      hidden: false,
       style:
         edge.label === "contains"
           ? { stroke: "#9ca3af", strokeDasharray: "5,5", strokeWidth: 1 } // Dashed light gray for containment

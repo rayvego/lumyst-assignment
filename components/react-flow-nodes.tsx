@@ -1,4 +1,6 @@
+import { getDescendants } from "@/core/node-collapse";
 import { ReactFlowNode } from "@/core/react-flow.service";
+import { useGraphStore } from "@/lib/graphStore";
 import { Handle, Position, useReactFlow } from "@xyflow/react";
 
 interface BaseNodeProps {
@@ -154,17 +156,61 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
         };
     }
   };
-
+  const adjacencyMap = useGraphStore((state) => state.adjacencyMap);
+  const setNodes = useGraphStore((state) => state.setNodes);
+  const setEdges = useGraphStore((state) => state.setEdges);
   const colors = getNodeColors(data.type);
 
+  const onCollapseToggle = () => {
+    const descendants = getDescendants(data.id, adjacencyMap);
+    const nodeId = data.id;
+
+    // Determine new state: if currently collapsed, expand; if expanded, collapse
+    const isCurrentlyCollapsed = data.isCollapsed ?? false;
+    const newCollapsedState = !isCurrentlyCollapsed;
+
+    // Toggle visibility for descendant nodes
+    setNodes((prev) =>
+      prev.map((n) => {
+        if (n.id === nodeId) {
+          // Update the clicked node's collapse state
+          return {
+            ...n,
+            data: {
+              ...n.data,
+              isCollapsed: newCollapsedState,
+            },
+          };
+        }
+        if (descendants.has(n.id)) {
+          // Toggle hidden state for descendants
+          return {
+            ...n,
+            hidden: newCollapsedState,
+            data: {
+              ...n.data,
+              isCollapsed: newCollapsedState,
+            },
+          };
+        }
+        return n;
+      })
+    );
+
+    // Toggle visibility for edges connected to descendants
+    setEdges((prev) =>
+      prev.map((e) => {
+        // Hide edges where source OR target is a descendant
+        if (descendants.has(e.source) || descendants.has(e.target)) {
+          return { ...e, hidden: !e.hidden };
+        }
+        return e;
+      })
+    );
+  };
+
   return (
-    <div
-      className="border-2 rounded-lg p-3 shadow-lg hover:shadow-xl transition-all cursor-pointer min-w-[160px] max-w-[220px] w-[220px] overflow-hidden"
-      style={{
-        background: `linear-gradient(to bottom right, ${colors.from}, ${colors.to})`,
-        borderColor: colors.border,
-      }}
-    >
+    <div className="border-2 bg-sky-400 rounded-lg p-3 shadow-lg hover:shadow-xl transition-all cursor-pointer min-w-[160px] max-w-[220px] w-[220px] overflow-hidden">
       <Handle
         type="target"
         position={Position.Top}
@@ -206,6 +252,9 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
               Override
             </p>
           )}
+          <button onClick={onCollapseToggle}>
+            {data.isCollapsed ? "+" : "-"}
+          </button>
         </div>
       </div>
 
@@ -277,7 +326,7 @@ export function CompactNode({ data, selected }: BaseNodeProps) {
         };
     }
   };
-  const { getNode, getNodeConnections,addEdges, addNodes, deleteElements } =
+  const { getNode, getNodeConnections, addEdges, addNodes, deleteElements } =
     useReactFlow();
   const colors = getNodeColors(data.type);
 
@@ -297,8 +346,13 @@ export function CompactNode({ data, selected }: BaseNodeProps) {
             edges: connections.map((c) => ({ id: c.edgeId })),
           });
           addNodes([fullNode]);
-		  addEdges(connections.map(c => ({id:c.edgeId,source:c.source,target:c.target})));
-
+          addEdges(
+            connections.map((c) => ({
+              id: c.edgeId,
+              source: c.source,
+              target: c.target,
+            }))
+          );
         }
       }}
     >
@@ -426,7 +480,7 @@ export function StubNode({ data, selected }: BaseNodeProps) {
 export const nodeTypes = {
   c1CategoryNode: C1CategoryNode,
   c2SubcategoryNode: C2SubcategoryNode,
-  graphNode: GraphNode,
+  node: GraphNode,
   stubNode: StubNode,
   compactNode: CompactNode,
 };

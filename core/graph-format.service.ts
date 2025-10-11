@@ -1,6 +1,6 @@
 import type { ElkExtendedEdge, ElkNode } from "elkjs/lib/elk-api";
 import ELK from "elkjs/lib/elk.bundled.js";
-import { createGraphMap } from "./node-collapse";
+import { createAdjacencyMap } from "./node-collapse";
 import type {
 	C1Output,
 	C2Relationship,
@@ -263,7 +263,7 @@ export class GraphFormatService {
     crossC1C2Relationships: CrossC1C2Relationship[]
   ) {
     const elk = new ELK();
-    const graphMap = createGraphMap(graphEdges);
+    const graphMap = createAdjacencyMap(graphEdges);
     const graphNodesObj: { [key: string]: GraphNode } = {};
     graphNodes.forEach((node) => {
       graphNodesObj[node.id] = node;
