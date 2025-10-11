@@ -76,7 +76,7 @@ export function C2SubcategoryNode({ data, selected }: CategoryNodeProps) {
 }
 
 // Graph Node Component (for individual code elements)
-export function GraphNode({ data, selected }: BaseNodeProps) {
+export function GraphNode({ data }: BaseNodeProps) {
 	// Get colors based on node type - matching formatService.ts
 	const getNodeColors = (nodeType: string) => {
 		switch (nodeType) {
@@ -135,7 +135,7 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
 		}
 	};
 
-	const colors = getNodeColors(data.type);
+	const colors = getNodeColors(data.type || 'default');
 
 	return (
 		<div
