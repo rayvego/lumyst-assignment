@@ -10,6 +10,7 @@ import {
   Panel,
   ReactFlowProvider,
   MiniMap,
+  ConnectionLineType,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback } from "react";
@@ -48,15 +49,36 @@ export default function App() {
           nodeTypes={nodeTypes}
           minZoom={0.1}
           maxZoom={2}
-          style={{ background: "white" }}
+          style={{ background: "#fcfcfc" }}
           defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+          connectionLineType={ConnectionLineType.SmoothStep}
+          defaultEdgeOptions={{
+            type: "smoothstep",
+            animated: false,
+            style: { strokeWidth: 2 },
+          }}
+          nodesDraggable={true}
+          nodesConnectable={true}
+          elementsSelectable={true}
+          snapToGrid={true}
+          snapGrid={[15, 15]}
+          panOnScroll={true}
+          selectionOnDrag={true}
+          panOnDrag={[1]}
+          selectNodesOnDrag={false}
         >
           <MiniMap
-            nodeStrokeWidth={100}
             zoomable
             pannable
+            zoomStep={10}
+            offsetScale={0.7}
             style={{
               backgroundColor: "white",
+              width: 200,
+              height: 120,
+              borderRadius: 8,
+              boxShadow: "0 2px 8px #0001",
+              border: "1px solid #e5e7eb",
             }}
           />
         </ReactFlow>

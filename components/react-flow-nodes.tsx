@@ -169,20 +169,21 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
       />
 
       <div className="flex items-center gap-2">
+		 <button className="p-2 text-white cursor-pointer absolute -top-1 right-0" onClick={onCollapseToggle}>
+              {data.isCollapsed ? <LucidePlus size={16} /> : <LucideMinus size={16} />}
+            </button>
         <div
           className="w-2 h-2 rounded-full flex-shrink-0"
           style={{ backgroundColor: colors.handle }}
         />
-        <div className="flex-1 min-w-0">
+        <div className=" flex-1 min-w-0">
           <h4
-            className="font-semibold text-white text-sm line-clamp-2 justify-between flex items-center"
+            className="font-semibold text-white text-sm line-clamp-2 items-center"
             title={data.label}
           >
             {data.label}
 
-            <button className="p-2 cursor-pointer" onClick={onCollapseToggle}>
-              {data.isCollapsed ? <LucidePlus /> : <LucideMinus />}
-            </button>
+           
           </h4>
           <p className="text-xs" style={{ color: colors.text }}>
             {data.syntaxType || data.type}
