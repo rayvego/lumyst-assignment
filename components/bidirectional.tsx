@@ -1,5 +1,5 @@
 import React from "react";
-import { BaseEdge, EdgeLabelRenderer, getBezierPath } from "@xyflow/react";
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, Position } from "@xyflow/react";
 
 interface BidirectionalEdgeProps {
   id: string;
@@ -7,10 +7,9 @@ interface BidirectionalEdgeProps {
   sourceY: number;
   targetX: number;
   targetY: number;
-  sourcePosition: any;
-  targetPosition: any;
+  sourcePosition: Position;
+  targetPosition: Position;
   style?: React.CSSProperties;
-  markerEnd?: string;
 }
 
 export default function BidirectionalEdge({
@@ -22,9 +21,8 @@ export default function BidirectionalEdge({
   sourcePosition,
   targetPosition,
   style = {},
-  markerEnd,
 }: BidirectionalEdgeProps) {
-  const offset = 40; 
+  const offset = 25; 
   const dx = targetX - sourceX;
   const dy = targetY - sourceY;
   const dist = Math.sqrt(dx * dx + dy * dy);
@@ -32,19 +30,24 @@ export default function BidirectionalEdge({
   const offsetX = (dy / dist) * offset;
   const offsetY = (-dx / dist) * offset;
 
-  const sourceXOffset = sourceX + offsetX / 2;
-  const sourceYOffset = sourceY + offsetY / 2;
-  const targetXOffset = targetX + offsetX / 2;
-  const targetYOffset = targetY + offsetY / 2;
-
-  const [edgePath, labelX, labelY] = getBezierPath({
-    sourceX: sourceXOffset,
-    sourceY: sourceYOffset,
-    sourcePosition,
-    targetX: targetXOffset,
-    targetY: targetYOffset,
-    targetPosition,
-  });
+  const paths = [
+    getBezierPath({
+      sourceX: sourceX + offsetX,
+      sourceY: sourceY + offsetY,
+      sourcePosition,
+      targetX: targetX + offsetX,
+      targetY: targetY + offsetY,
+      targetPosition,
+    }),
+    getBezierPath({
+      sourceX: sourceX - offsetX,
+      sourceY: sourceY - offsetY,
+      sourcePosition,
+      targetX: targetX - offsetX,
+      targetY: targetY - offsetY,
+      targetPosition,
+    }),
+  ];
 
   return (
     <>
@@ -63,33 +66,29 @@ export default function BidirectionalEdge({
 
       <BaseEdge
         id={id}
-        path={edgePath}
-        style={{ stroke: "#555", strokeWidth: 2, ...style }}
+        path={paths[0][0]}
+        style={{ stroke: "#2563eb", strokeWidth: 2, ...style }}
         markerEnd="url(#arrowhead)"
       />
 
       <BaseEdge
         id={`${id}-reverse`}
-        path={edgePath}
-        style={{
-          stroke: "#555",
-          strokeWidth: 2,
-          strokeDasharray: "5,5",
-          ...style,
-        }}
-        markerStart="url(#arrowhead)"
+        path={paths[1][0]}
+        style={{ stroke: "#f87171", strokeWidth: 2, strokeDasharray: "5,5", ...style }}
+        markerEnd="url(#arrowhead)"
       />
 
       <EdgeLabelRenderer>
         <div
           style={{
             position: "absolute",
-            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            fontSize: 10,
+            transform: `translate(-50%, -50%) translate(${(paths[0][1] + paths[1][1]) / 2}px, ${(paths[0][2] + paths[1][2]) / 2}px)`,
+            fontSize: 12,
             color: "#333",
             background: "white",
             padding: "2px 4px",
             borderRadius: "4px",
+            pointerEvents: "none",
           }}
           className="nodrag nopan"
         >

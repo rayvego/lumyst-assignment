@@ -1,3 +1,14 @@
+import type { Node, Edge } from "@xyflow/react";
+
+export type ReactFlowNode = Node<{
+  label: string;
+  [key: string]: any;
+}>;
+
+export type ReactFlowEdge = Edge<{
+  [key: string]: any;
+}>;
+
 export interface GraphNode {
 	id: string;
 	label: string;
