@@ -1,6 +1,5 @@
 import type { ElkExtendedEdge, ElkNode } from "elkjs/lib/elk-api";
 import ELK from "elkjs/lib/elk.bundled.js";
-import { createAdjacencyMap } from "./node-collapse";
 import type {
   C1Output,
   C2Relationship,
@@ -10,9 +9,7 @@ import type {
   GraphNode,
 } from "./types";
 
-
 const processStubNodes = (graphNodes: GraphNode[], graphEdges: GraphEdge[]) => {
-
   const graphNodesObj: { [key: string]: GraphNode } = {};
   graphNodes.forEach((node) => {
     graphNodesObj[node.id] = node;
@@ -26,9 +23,8 @@ const processStubNodes = (graphNodes: GraphNode[], graphEdges: GraphEdge[]) => {
     );
   });
 
-
   dependentCounter.forEach((count, nodeId) => {
-	//Create stub nodes only if a node has more than 1 dependent
+    //Create stub nodes only if a node has more than 1 dependent
     if (count > 1) {
       const node = graphNodesObj[nodeId];
       for (let i = 0; i < count; i++) {
@@ -52,6 +48,7 @@ const processStubNodes = (graphNodes: GraphNode[], graphEdges: GraphEdge[]) => {
 
 export class GraphFormatService {
   async layoutCategoriesWithElk(
+    elk: typeof ELK,
     graphNodes: GraphNode[],
     graphEdges: GraphEdge[],
     c1Outputs: C1Output[],
@@ -59,8 +56,6 @@ export class GraphFormatService {
     c2Relationships: C2Relationship[],
     crossC1C2Relationships: CrossC1C2Relationship[]
   ) {
-    const elk = new ELK();
-
     //This creates stub nodes for any node with multiple dependents
     processStubNodes(graphNodes, graphEdges);
 
@@ -149,6 +144,11 @@ export class GraphFormatService {
         "elk.direction": "DOWN",
         "elk.layered.spacing.nodeNodeBetweenLayers": "80",
         "elk.spacing.nodeNode": "40",
+
+        // "elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
+        // "elk.layered.nodePlacement.bk.fixedAlignment": "BALANCED",
+        // "elk.layered.nodePlacement.favorStraightEdges": "true",
+        // "elk.layered.nodePlacement.compaction": "true",
       },
       children: elkNodes,
       edges: elkEdges,

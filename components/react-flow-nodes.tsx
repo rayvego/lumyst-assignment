@@ -3,10 +3,8 @@ import { ReactFlowNode } from "@/core/react-flow.service";
 import { useGraphStore } from "@/lib/graphStore";
 import { Handle, Position, useReactFlow } from "@xyflow/react";
 import {
-  LucideMaximize,
-  LucideMinimize,
-  LucideMinus,
-  LucidePlus,
+	LucideMinus,
+	LucidePlus
 } from "lucide-react";
 
 const getNodeColors = (nodeType: string) => {
@@ -162,13 +160,14 @@ export function C2SubcategoryNode({ data, selected }: CategoryNodeProps) {
 
 // Graph Node Component (for individual code elements)
 export function GraphNode({ data, selected }: BaseNodeProps) {
-  const adjacencyMap = useGraphStore((state) => state.adjacencyMap);
   const setNodes = useGraphStore((state) => state.setNodes);
   const setEdges = useGraphStore((state) => state.setEdges);
   const colors = getNodeColors(data.type);
+  // Fetch adjacency map on demand to avoid subscribing & rerendering this component
+  const getAdjacencyMap = () => useGraphStore.getState().adjacencyMap;
 
   const onCollapseToggle = () => {
-    const descendants = getDescendants(data.id, adjacencyMap);
+    const descendants = getDescendants(data.id, getAdjacencyMap());
     const nodeId = data.id;
 
     // Determine new state: if currently collapsed, expand; if expanded, collapse
@@ -236,9 +235,9 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
           >
             {data.label}
 
-			<button className="p-2 cursor-pointer" onClick={onCollapseToggle}>
-            {data.isCollapsed ? <LucidePlus /> : <LucideMinus />}
-          </button>
+            <button className="p-2 cursor-pointer" onClick={onCollapseToggle}>
+              {data.isCollapsed ? <LucidePlus /> : <LucideMinus />}
+            </button>
           </h4>
           <p className="text-xs" style={{ color: colors.text }}>
             {data.syntaxType || data.type}
@@ -262,7 +261,6 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
               Override
             </p>
           )}
-          
         </div>
       </div>
 
@@ -286,10 +284,6 @@ export function CompactNode({ data, selected }: BaseNodeProps) {
   return (
     <div
       className="border-2 rounded-lg p-3 shadow-lg bg-cyan-100 hover:shadow-xl transition-all cursor-pointer min-w-[160px] max-w-[220px] w-[220px] overflow-hidden"
-      //   style={{
-      //     background: `linear-gradient(to bottom right, ${colors.from}, ${colors.to})`,
-      //     borderColor: colors.border,
-      //   }}
       onClick={() => {
         console.log("Compact node clicked", data.id);
         const fullNode = getNode(data.id.replace("-compact", ""));
@@ -330,62 +324,7 @@ export function CompactNode({ data, selected }: BaseNodeProps) {
 
 export function StubNode({ data, selected }: BaseNodeProps) {
   // Get colors based on node type - matching formatService.ts
-  const getNodeColors = (nodeType: string) => {
-    switch (nodeType) {
-      case "class":
-      case "interface":
-        return {
-          from: "#7c3aed", // purple-600
-          to: "#5b21b6", // purple-800
-          border: "#a78bfa", // purple-400
-          handle: "#ddd6fe", // purple-200
-          text: "#e9d5ff", // purple-200
-        };
-      case "method":
-      case "function":
-      case "constructor":
-        return {
-          from: "#f59e0b", // amber-500
-          to: "#d97706", // amber-600
-          border: "#fbbf24", // amber-400
-          handle: "#fde68a", // amber-200
-          text: "#fde68a", // amber-200
-        };
-      case "variable":
-      case "property":
-        return {
-          from: "#ef4444", // red-500
-          to: "#dc2626", // red-600
-          border: "#f87171", // red-400
-          handle: "#fecaca", // red-200
-          text: "#fecaca", // red-200
-        };
-      case "file":
-        return {
-          from: "#10b981", // emerald-500
-          to: "#059669", // emerald-600
-          border: "#34d399", // emerald-400
-          handle: "#a7f3d0", // emerald-200
-          text: "#a7f3d0", // emerald-200
-        };
-      case "folder":
-        return {
-          from: "#0ea5e9", // sky-500
-          to: "#0284c7", // sky-600
-          border: "#38bdf8", // sky-400
-          handle: "#bae6fd", // sky-200
-          text: "#bae6fd", // sky-200
-        };
-      default:
-        return {
-          from: "#6b7280", // gray-500
-          to: "#4b5563", // gray-600
-          border: "#9ca3af", // gray-400
-          handle: "#d1d5db", // gray-300
-          text: "#d1d5db", // gray-300
-        };
-    }
-  };
+
   const { getNode, setCenter } = useReactFlow();
 
   const colors = getNodeColors(data.type);

@@ -9,6 +9,7 @@ import {
   ReactFlow,
   Panel,
   ReactFlowProvider,
+  MiniMap,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback } from "react";
@@ -48,7 +49,17 @@ export default function App() {
           minZoom={0.1}
           maxZoom={2}
           style={{ background: "white" }}
-        />
+          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+        >
+          <MiniMap
+            nodeStrokeWidth={100}
+            zoomable
+            pannable
+            style={{
+              backgroundColor: "white",
+            }}
+          />
+        </ReactFlow>
         {/* Overlay search in top-left corner inside ReactFlow context */}
         <Panel
           position="top-left"
