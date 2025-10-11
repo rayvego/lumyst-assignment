@@ -50,20 +50,26 @@ export class ReactFlowService {
 			}))
 		];
 
-		const reactFlowEdges = edges.map((edge) => ({
-			id: edge.id,
-			source: edge.source,
-			target: edge.target,
-			label: edge.label,
-			style: edge.label === 'contains'
-				? { stroke: '#9ca3af', strokeDasharray: '5,5', strokeWidth: 1 } // Dashed light gray for containment
-				: edge.id.startsWith('c2_relationship')
-				? { stroke: '#059669', strokeWidth: 2 } // Dark green for C2-C2 relationships
-				: edge.id.startsWith('cross_c1_c2_rel')
-				? { stroke: '#d97706', strokeWidth: 2 } // Dark orange for cross C1-C2 relationships
-				: { stroke: '#374151', strokeWidth: 1 }, // Dark gray for other edges
-			labelStyle: { fill: '#000', fontWeight: '500' },
-		}));
+				const reactFlowEdges = edges.map((edge) => {
+				const reverseEdge = edges.find(
+					(e) => e.source === edge.target && e.target === edge.source
+				);
+
+				const isBidirectional = !!reverseEdge;
+
+				return {
+					id: edge.id,
+					source: edge.source,
+					target: edge.target,
+					label: edge.label,
+					type: isBidirectional ? "bidirectional" : "default",
+					style: {
+					stroke: isBidirectional ? "#2563eb" : "#374151",
+					strokeWidth: isBidirectional ? 2 : 1.5,
+					},
+					labelStyle: { fill: "#000", fontWeight: "500" },
+				};
+				});
 
 		return {
 			nodes: reactFlowNodes,
