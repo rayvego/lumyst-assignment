@@ -2,12 +2,7 @@ import { ReactFlowNode } from "@/core/react-flow.service";
 import { useGraphStore } from "@/lib/graphStore";
 import { getDescendants, getNodeColors } from "@/lib/utils";
 import { Handle, Position, useReactFlow } from "@xyflow/react";
-import {
-	LucideMinus,
-	LucidePlus
-} from "lucide-react";
-
-
+import { LucideMinus, LucidePlus } from "lucide-react";
 
 interface BaseNodeProps {
   data: ReactFlowNode["data"];
@@ -169,9 +164,16 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
       />
 
       <div className="flex items-center gap-2">
-		 <button className="p-2 text-white cursor-pointer absolute -top-1 right-0" onClick={onCollapseToggle}>
-              {data.isCollapsed ? <LucidePlus size={16} /> : <LucideMinus size={16} />}
-            </button>
+        <button
+          className="p-2 text-white cursor-pointer absolute -top-1 right-0"
+          onClick={onCollapseToggle}
+        >
+          {data.isCollapsed ? (
+            <LucidePlus size={16} />
+          ) : (
+            <LucideMinus size={16} />
+          )}
+        </button>
         <div
           className="w-2 h-2 rounded-full flex-shrink-0"
           style={{ backgroundColor: colors.handle }}
@@ -182,8 +184,6 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
             title={data.label}
           >
             {data.label}
-
-           
           </h4>
           <p className="text-xs" style={{ color: colors.text }}>
             {data.syntaxType || data.type}
@@ -219,7 +219,6 @@ export function GraphNode({ data, selected }: BaseNodeProps) {
     </div>
   );
 }
-
 
 export function StubNode({ data, selected }: BaseNodeProps) {
   // Get colors based on node type - matching formatService.ts

@@ -144,11 +144,6 @@ export class GraphFormatService {
         "elk.direction": "DOWN",
         "elk.layered.spacing.nodeNodeBetweenLayers": "80",
         "elk.spacing.nodeNode": "40",
-
-        // "elk.layered.nodePlacement.strategy": "BRANDES_KOEPF",
-        // "elk.layered.nodePlacement.bk.fixedAlignment": "BALANCED",
-        // "elk.layered.nodePlacement.favorStraightEdges": "true",
-        // "elk.layered.nodePlacement.compaction": "true",
       },
       children: elkNodes,
       edges: elkEdges,
