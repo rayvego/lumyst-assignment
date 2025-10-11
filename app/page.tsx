@@ -3,13 +3,16 @@
 import { nodeTypes } from "@/components/react-flow-nodes";
 import { useGraph } from "@/hooks/useGraph";
 import {
-	addEdge,
-	applyEdgeChanges,
-	applyNodeChanges,
-	ReactFlow,
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
+  ReactFlow,
+  Panel,
+  ReactFlowProvider,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback } from "react";
+import GraphSearch from "@/components/graph-search";
 
 export default function App() {
   const { nodes, edges, setEdges, setNodes } = useGraph();
@@ -32,18 +35,30 @@ export default function App() {
 
   return (
     <div style={{ width: "100vw", height: "100vh", background: "white" }}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        fitView
-        nodeTypes={nodeTypes}
-        minZoom={0.1}
-        maxZoom={2}
-        style={{ background: "white" }}
-      />
+      <ReactFlowProvider>
+        {" "}
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          fitView
+          nodeTypes={nodeTypes}
+          minZoom={0.1}
+          maxZoom={2}
+          style={{ background: "white" }}
+        />
+        {/* Overlay search in top-left corner inside ReactFlow context */}
+        <Panel
+          position="top-left"
+          style={{
+            width: "50vw",
+          }}
+        >
+          <GraphSearch />
+        </Panel>
+      </ReactFlowProvider>
     </div>
   );
 }
