@@ -16,28 +16,28 @@ export function convertDataToGraphNodesAndEdges(): {
 	c2Relationships: C2Relationship[];
 	crossC1C2Relationships: CrossC1C2Relationship[];
 } {
-	const graphNodes: GraphNode[] = analysisData.analysisData.graphNodes.map((node) => ({
+	const graphNodes: GraphNode[] = analysisData.analysisData.graphNodes?.map((node: any) => ({
 		id: node.id,
 		label: node.label,
-	}));
+	})) || [];
 
-	const graphEdges: GraphEdge[] = analysisData.analysisData.graphEdges.map((edge) => ({
+	const graphEdges: GraphEdge[] = analysisData.analysisData.graphEdges?.map((edge: any) => ({
 		id: edge.id,
 		source: edge.source,
 		target: edge.target,
 		label: edge.label ?? "",
-	}));
+	})) || [];
 
-	const c1Output: C1Output[] = analysisData.analysisData.c1Output.map((output) => ({
+	const c1Output: C1Output[] = analysisData.analysisData.c1Output.map((output: any) => ({
 		id: output.id,
 		label: output.c1Category,
 		c1Category: output.c1Category,
 		nodesInCategory: output.nodesInCategory,
-		nodeIds: output.nodeIds,
+		nodeIds: output.nodeIds || [],
 	}));
 
 	const c2Subcategories: C2Subcategory[] = analysisData.analysisData.c2Subcategories.map(
-		(subcategory) => ({
+		(subcategory: any) => ({
 			id: subcategory.id,
 			label: subcategory.c2Name,
 			c1CategoryId: subcategory.c1CategoryId,
@@ -45,29 +45,29 @@ export function convertDataToGraphNodesAndEdges(): {
 			description: subcategory.description,
 			purpose: subcategory.purpose,
 			nodeCount: subcategory.nodeCount,
-			nodeIds: subcategory.nodeIds,
+			nodeIds: subcategory.nodeIds || [],
 		}),
 	);
 
-	const c2Relationships: C2Relationship[] = analysisData.analysisData.c2Relationships.map(
-		(relationship) => ({
-			id: relationship.id,
+	const c2Relationships: C2Relationship[] = analysisData.analysisData.c2Relationships?.map(
+		(relationship: any, index: number) => ({
+			id: relationship.id || `c2_relationship_${index}`,
 			label: relationship.relationshipType,
 			fromC2: relationship.fromC2,
 			toC2: relationship.toC2,
 			c1CategoryId: relationship.c1CategoryId,
 		}),
-	);
+	) || [];
 
 	const crossC1C2Relationships: CrossC1C2Relationship[] =
-		analysisData.analysisData.crossC1C2Relationships.map((relationship) => ({
+		analysisData.analysisData.crossC1C2Relationships?.map((relationship: any) => ({
 			id: relationship.id,
 			label: relationship.relationshipType,
 			fromC1: relationship.fromC1,
 			fromC2: relationship.fromC2,
 			toC1: relationship.toC1,
 			toC2: relationship.toC2,
-		}));
+		})) || [];
 
 	return {
 		graphNodes,
