@@ -1,9 +1,8 @@
 import { convertDataToGraphNodesAndEdges } from "@/core/data/data-converter";
 import { GraphFormatService } from "@/core/graph-format.service";
-import { createAdjacencyMap } from "@/core/node-collapse";
-import { ReactFlowNode, ReactFlowService } from "@/core/react-flow.service";
+import { ReactFlowService } from "@/core/react-flow.service";
 import { useGraphStore } from "@/lib/graphStore";
-import { ElkExtendedEdge, ElkNode } from "elkjs";
+import { createAdjacencyMap } from "@/lib/utils";
 import ELK from "elkjs/lib/elk.bundled.js";
 
 import { useEffect, useMemo } from "react";
